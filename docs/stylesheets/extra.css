@@ -60,3 +60,68 @@
 .md-typeset h1 {
   margin-bottom: 0.6em;
 }
+
+/* Collapsible paper cards (one per paper, reader expands what they want) */
+.md-typeset details.paper-card {
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 10px;
+  margin: 14px 0;
+  padding: 0;
+  background: var(--md-code-bg-color);
+  background: transparent;
+  box-shadow: none;
+  overflow: hidden;
+}
+.md-typeset details.paper-card > summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 14px 18px;
+  font-size: 1.0em;
+  font-weight: 400;
+  background: transparent;
+  border-left: 3px solid var(--md-primary-fg-color);
+  transition: background 0.12s ease;
+}
+.md-typeset details.paper-card > summary::-webkit-details-marker {
+  display: none;
+}
+.md-typeset details.paper-card > summary::before {
+  content: "▸";
+  display: inline-block;
+  width: 1em;
+  margin-right: 6px;
+  color: var(--md-primary-fg-color);
+  transition: transform 0.15s ease;
+}
+.md-typeset details.paper-card[open] > summary::before {
+  transform: rotate(90deg);
+}
+.md-typeset details.paper-card > summary:hover {
+  background: var(--md-default-fg-color--lightest);
+}
+.md-typeset details.paper-card[open] > summary {
+  border-bottom: 1px solid var(--md-default-fg-color--lightest);
+}
+.md-typeset details.paper-card > *:not(summary) {
+  padding-left: 18px;
+  padding-right: 18px;
+}
+.md-typeset details.paper-card > *:last-child {
+  padding-bottom: 14px;
+}
+
+/* Topic chip inside the summary line */
+.md-typeset .topic-chip {
+  display: inline-block;
+  padding: 1px 9px;
+  border-radius: 999px;
+  font-size: 0.78em;
+  font-weight: 500;
+  background: rgba(83, 74, 183, 0.14);
+  color: #3c3489;
+  margin: 0 2px;
+}
+[data-md-color-scheme="slate"] .md-typeset .topic-chip {
+  background: rgba(127, 119, 221, 0.22);
+  color: #cecbf6;
+}

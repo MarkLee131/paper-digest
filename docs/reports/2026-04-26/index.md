@@ -38,7 +38,9 @@ This window's haul is dominated by three currents. (1) LLM-agentic software anal
 
 ## 2. Outstanding — Deep Read
 
-### 2.1 Hermes — Path-Sensitive Pointer Analysis Made Scalable for SVFA
+<details class="paper-card" markdown>
+<summary><strong>2.1</strong> · <span class="topic-chip">static analysis</span> · Path-Sensitive Pointer Analysis Made Scalable for SVFA — 9.84× speedup vs Falcon</summary>
+
 
 **Authors:** Yuxuan He, Ruilin Jiang, He Zhang, Qingkai Shi, Huaxun Huang, Rongxin Wu (Xiamen University & Nanjing University)
 **Venue:** PACMPL OOPSLA1, Article 103, April 2026
@@ -107,9 +109,11 @@ The *recipe* — discard precision artefacts that current clients don't actually
 
 Cross-language transfer beyond C/C++; how the speedup curve continues to climb (or plateau) on codebases beyond MariaDB-scale; soundness interaction with aggressive LLVM-IR optimisation passes that re-shape memory layouts.
 
----
+</details>
 
-### 2.2 Prunario — Pruning Likely-Redundant AV Test Scenarios
+<details class="paper-card" markdown>
+<summary><strong>2.2</strong> · <span class="topic-chip">AV testing</span> · Pruning likely-redundant scenarios via simulation prediction — 23 zero-day Autoware bugs</summary>
+
 
 **Authors:** Minsu Kim, Sunbeom So, Hakjoo Oh (Korea University)
 **Venue:** PACMPL OOPSLA1, Article 154, April 2026
@@ -177,9 +181,11 @@ The framing — "*statically* predict the ADS runtime behaviour without executin
 
 How much of the speedup is attributable to the redundancy abstraction \(\alpha\) vs the speed-prediction regressors; sensitivity of \(\alpha\) to scenarios outside the training distribution; whether the same approach scales to multi-NPC and vulnerable-road-user scenarios.
 
----
+</details>
 
-### 2.3 Serpent — Practical Token Theft on Apple Intelligence
+<details class="paper-card" markdown>
+<summary><strong>2.3</strong> · <span class="topic-chip">systems security</span> · Cross-device token replay against Apple Intelligence — CVE assigned, bounty paid</summary>
+
 
 **Authors:** Haoling (Henry) Zhou, Shixuan Zhao, Chao Wang, Zhiqiang Lin (The Ohio State University)
 **Venue:** [arXiv:2604.15637](https://arxiv.org/abs/2604.15637) (cs.CR), 2026-04-17. CVE assigned, bug-bounty awarded.
@@ -237,9 +243,11 @@ Whether the same gap exists on the iOS-side Apple Intelligence flow (the paper s
 
 > *"Anonymising identity does not by itself make the AI service secure; enforcing non-transferability requires cryptographic binding to the rightful user."*
 
----
+</details>
 
-### 2.4 AnalysisBench / AnalysisAgent — Benchmarking LLM Agents on Software Analysis Tasks
+<details class="paper-card" markdown>
+<summary><strong>2.4</strong> · <span class="topic-chip">LLM agents · SE</span> · AnalysisBench / AnalysisAgent — 94% manual-verified success on 35 tool-project pairs</summary>
+
 
 **Authors:** Islem Bouzenia, Cristian Cadar, Michael Pradel (CISPA · Imperial College · CISPA)
 **Venue:** [arXiv:2604.11270](https://arxiv.org/abs/2604.11270) (cs.SE), v2 2026-04-17.
@@ -316,19 +324,35 @@ How the architecture-vs-capability finding evolves with stronger frontier models
 
 ## 3. Keep — Brief Deep Read
 
-### 3.1 OS-SANITIZER — eBPF-Based Dynamic Defect Inference for Linux
+</details>
+
+<details class="paper-card" markdown>
+<summary><strong>3.1</strong> · <span class="topic-chip">dynamic analysis</span> · OS-SANITIZER — eBPF-based dynamic defect inference in Linux applications</summary>
+
 
 A. Crump, S. Sihag, F. Bauckholt, K. Hassler, T. Holz (CISPA · MPI-SP), preprint 2026. [Scholar lookup](https://scholar.google.com/scholar?q=OS-SANITIZER+latent+defect+inference+Linux+Holz). The paper coins **dynamic defect inference**: don't wait for a crash, look at *benign* runtime behaviour through eBPF and apply code-smell-style heuristics to flag latent defects that *might* fail in a different environment. eBPF is repurposed from its usual observability/networking role into a system-wide analysis substrate that watches user+kernel events live. The prototype uses heuristic eBPF programs targeting well-known defect classes; on widely-used Linux applications it identified **40+ issues, including severe vulnerabilities, some over a decade old and present on a majority of distributions**. Reusable pattern: *static-style code smells over dynamic traces* — port the static-analysis tradition of "smell catalogues" into runtime oracles, recovering precision that pure crash-based dynamic testing leaves on the table.
 
-### 3.2 Determining the Unreachable — Constraint-Guided Reachability for Dependency Vulnerabilities
+</details>
+
+<details class="paper-card" markdown>
+<summary><strong>3.2</strong> · <span class="topic-chip">dependency CVE</span> · Constraint-guided reachability filters unreachable CVE matches in dependencies</summary>
+
 
 W. Feng et al., PACMPL 2026. [Scholar lookup](https://scholar.google.com/scholar?q=Determining+the+Unreachable+Constraint-Guided+Reachability+Dependency+Vulnerabilities). Tackles the SCA "false-positive-by-default" problem — most reported CVE matches in dependencies are *unreachable* from the application. Constraint-guided reachability filters them out. Reusable pattern: *negative reachability as triage* — certify unreachability rather than enumerate positives; this is the actual industrial workflow.
 
-### 3.3 Fragile Deliveries — Android Parcel Inconsistencies
+</details>
+
+<details class="paper-card" markdown>
+<summary><strong>3.3</strong> · <span class="topic-chip">Android security</span> · Differential serializer audit of Android Parcel IPC</summary>
+
 
 H. Chen, C. Wang et al. (Z. Lin co-author lineage), preprint 2026. [Scholar lookup](https://scholar.google.com/scholar?q=Fragile+Deliveries+Android+Parcel+Inconsistencies). Audits Parcel-based IPC on Android for serializer/deserializer asymmetries — the writing side and reading side diverge in interpretation, a classic source of confused-deputy and type-confusion bugs. Reusable pattern: *differential serializer audit*; same audit applies to JSON/Protobuf in cloud RPC, gRPC server/client mismatches, kernel ioctl marshallers.
 
-### 3.4 Denoising Fault Localisation with Test-Line Proximity
+</details>
+
+<details class="paper-card" markdown>
+<summary><strong>3.4</strong> · <span class="topic-chip">fault localisation</span> · Test-line proximity as a structural prior over noisy SBFL</summary>
+
 
 M. Smytzek, A. Zeller, preprint 2026. [Scholar lookup](https://scholar.google.com/scholar?q=Denoising+Fault+Localization+Test+Line+Proximity+Zeller). Statistical fault localisation is famously noisy. Use a structural prior — graph distance between failing tests and source lines — to denoise standard SBFL formulae. Reusable pattern: *structural prior × statistical estimator*; multiply rather than replace.
 
@@ -336,7 +360,11 @@ M. Smytzek, A. Zeller, preprint 2026. [Scholar lookup](https://scholar.google.co
 
 ## 4. Borderline High-Priority
 
-### 4.1 FAUDITOR — Auditor-Knowledge-Learning Fuzzing for Smart-Contract MEVuls
+</details>
+
+<details class="paper-card" markdown>
+<summary><strong>4.1</strong> · <span class="topic-chip">smart contracts</span> · FAUDITOR — auditor-knowledge-learning fuzzing, 4 MEVul paradigms, 220 zero-days</summary>
+
 
 Bowen Cai, Weiheng Bai, Hangyun Tang, Youshui Lu, Kangjie Lu (Univ. of Minnesota / Fudan / XJTU). [arXiv:2604.18395](https://arxiv.org/abs/2604.18395) · [PDF in this repo](../../papers/FAUDITOR_Cai_2026.pdf). FAUDITOR formalises *Monetarily Exploitable Vulnerabilities* (MEVuls) into **four security paradigms** with first-order propositions, which is rare in smart-contract fuzzing papers and makes the contribution genuinely citable.
 
@@ -411,3 +439,6 @@ A third thread — agentic SE moving from existence proofs to architecture scien
 4. **Pose the research question verbatim** when it cleanly captures the threat model — Serpent's "Is it possible to easily steal the tokens from a victim's Mac and use them on another Mac…" is one paragraph readers carry around.
 5. **Solution-space reduction is the contribution.** Hermes doesn't make SAT faster; it discards precision artefacts SVFA didn't need. Prunario doesn't accelerate the simulator; it *avoids* it.
 6. **Formal definitions earn extended treatment.** FAUDITOR's four propositions and Hermes's path-condition formula turn otherwise generic engineering papers into citable reference points.
+
+</details>
+

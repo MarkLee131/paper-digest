@@ -11,9 +11,9 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
 ### [2026-04-26](reports/2026-04-26/index.md)
-<div class="meta"><span class="chip outstanding">Outstanding 4</span><span class="chip keep">Keep 4</span><span class="chip borderline">Borderline 1</span></div>
+<div class="meta"><span class="chip outstanding">Outstanding 4</span><span class="chip keep">Keep 3</span><span class="chip borderline">Borderline 1</span></div>
 
-This window's haul is dominated by three currents. (1) LLM-agentic software analysis is consolidating from a "can it work?" question into a benchmarking question — Pradel's group ships *AnalysisBench*, and David Lo's group reports a 100+ CVE field outcome from agentic vulnerability discovery. (2) Path/program-analysis classics are being made scalable for…
+This window's haul is dominated by three currents. (1) LLM-agentic software analysis is consolidating from a "can it work?" question into a benchmarking question — Pradel's group ships *AnalysisBench*. (2) Path/program-analysis classics are being made scalable for modern workloads — *Hermes* (Wu et al.) tackles path-sensitive pointer analysis under…
 </div>
 <!-- END AUTO-INDEX -->
 
