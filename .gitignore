@@ -1,0 +1,32 @@
+# MkDocs build output
+site/
+
+# Legacy Jekyll output (in case anything still emits it)
+_site/
+.jekyll-cache/
+.jekyll-metadata
+.sass-cache/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*~
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Local task scratch
+.scratch/
+*.tmp
+*.log
+
+# Private archive — full uncensored reports including Bypass/Remove evaluations
+# and any other content we deliberately keep out of the public Pages site.
+.private/

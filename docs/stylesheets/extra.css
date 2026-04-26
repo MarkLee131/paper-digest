@@ -1,0 +1,62 @@
+/* Tighter line-height for technical reading */
+.md-typeset {
+  line-height: 1.65;
+}
+
+/* Coloured chips for paper-count badges */
+.md-typeset .chip {
+  display: inline-block;
+  padding: 1px 9px;
+  border-radius: 999px;
+  font-size: 0.78em;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+.md-typeset .chip.outstanding {
+  background: rgba(29, 158, 117, 0.15);
+  color: #0f6e56;
+}
+.md-typeset .chip.keep {
+  background: rgba(83, 74, 183, 0.15);
+  color: #3c3489;
+}
+.md-typeset .chip.borderline {
+  background: rgba(216, 90, 48, 0.15);
+  color: #993c1d;
+}
+[data-md-color-scheme="slate"] .md-typeset .chip.outstanding {
+  background: rgba(29, 158, 117, 0.22);
+  color: #9fe1cb;
+}
+[data-md-color-scheme="slate"] .md-typeset .chip.keep {
+  background: rgba(127, 119, 221, 0.22);
+  color: #cecbf6;
+}
+[data-md-color-scheme="slate"] .md-typeset .chip.borderline {
+  background: rgba(216, 90, 48, 0.22);
+  color: #f5c4b3;
+}
+
+/* Index card list on the homepage */
+.md-typeset .digest-card {
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin: 12px 0;
+}
+.md-typeset .digest-card h3 {
+  margin: 0 0 6px;
+  font-size: 1.1em;
+}
+.md-typeset .digest-card .meta {
+  font-size: 0.85em;
+  color: var(--md-default-fg-color--light);
+  margin-bottom: 8px;
+}
+
+/* Tighten the H1 in long reports */
+.md-typeset h1 {
+  margin-bottom: 0.6em;
+}
