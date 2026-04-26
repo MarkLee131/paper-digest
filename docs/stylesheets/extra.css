@@ -110,6 +110,28 @@
   padding-bottom: 14px;
 }
 
+/* Feedback buttons inside the paper-card summary line */
+.md-typeset .feedback-buttons {
+  float: right;
+  display: inline-flex;
+  gap: 4px;
+  margin-left: 12px;
+  font-size: 1.1em;
+  line-height: 1;
+}
+.md-typeset .feedback-buttons a {
+  text-decoration: none;
+  padding: 2px 6px;
+  border-radius: 6px;
+  opacity: 0.55;
+  transition: opacity 0.15s ease, background 0.15s ease;
+  color: inherit;
+}
+.md-typeset .feedback-buttons a:hover {
+  opacity: 1.0;
+  background: var(--md-default-fg-color--lightest);
+}
+
 /* Topic chip inside the summary line */
 .md-typeset .topic-chip {
   display: inline-block;
