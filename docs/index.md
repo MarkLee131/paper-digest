@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-04-27](reports/2026-04-27/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 1</span><span class="chip borderline">Borderline 0</span></div>
+
+A thin alert window. Gmail's `from:scholaralerts-noreply@google.com newer_than:1d` query returned exactly one new alert thread — a "Recommended articles" delivery containing a single paper. None of the followed-researcher channels emitted a digest in this window; their previous batch (2026-04-25) was already absorbed into yesterday's 2026-04-26 report.
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-04-26](reports/2026-04-26/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 4</span><span class="chip keep">Keep 3</span><span class="chip borderline">Borderline 1</span></div>
 
