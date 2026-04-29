@@ -17,6 +17,13 @@ A modest alert window — five raw threads, two papers passed Stage-1 screening.
 </div>
 
 <div class="digest-card" markdown>
+### [2026-04-28](reports/2026-04-28/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 1</span><span class="chip borderline">Borderline 0</span></div>
+
+The Scholar-alert side of this window was empty: the next batch from Google Scholar didn't arrive until late on 04-28 CST (and was caught by the 04-29 report). The user-curated self-email queue, however, contributed exactly one paper — flagged via the new STEP 2b pipeline that picks up self-addressed emails whose subject contains "paper" or "read".
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-04-27](reports/2026-04-27/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 1</span><span class="chip borderline">Borderline 0</span></div>
 

@@ -73,7 +73,7 @@ def main(argv: list[str]) -> int:
     # Format produced by SKILL.md:
     #   <summary><strong>N.X</strong> · <span class="topic-chip">topic</span> · Title …</summary>
     summary_re = re.compile(
-        r'<summary>(<strong>([2-4]\.\d+)</strong>\s*·\s*<span class="topic-chip">([^<]+)</span>\s*·\s*([^<]+))</summary>'
+        r'<summary>(<strong>([0-9]+\.\d+)</strong>\s*·\s*<span class="topic-chip">([^<]+)</span>\s*·\s*([^<]+))</summary>'
     )
 
     # Collect minimal metadata per paper from the surrounding section text.
@@ -82,7 +82,7 @@ def main(argv: list[str]) -> int:
     sections = re.split(r"<details class=\"paper-card\" markdown>", text)
     metadata: dict[str, tuple[str, str]] = {}
     for sec in sections[1:]:
-        ms = re.search(r'<summary>.*?<strong>([2-4]\.\d+)</strong>.*?</summary>', sec, re.S)
+        ms = re.search(r'<summary>.*?<strong>([0-9]+\.\d+)</strong>.*?</summary>', sec, re.S)
         if not ms:
             continue
         num = ms.group(1)
