@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-04-29](reports/2026-04-29/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 2</span><span class="chip borderline">Borderline 0</span></div>
+
+A modest alert window — five raw threads, two papers passed Stage-1 screening. Both come from followed-researcher channels and converge on the same architectural insight despite operating in completely different domains: **decouple LLM production from verification, and ground every decision in immutable external evidence.**
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-04-27](reports/2026-04-27/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 1</span><span class="chip borderline">Borderline 0</span></div>
 
