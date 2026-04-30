@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-04-30](reports/2026-04-30/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 2</span><span class="chip keep">Keep 2</span><span class="chip borderline">Borderline 1</span></div>
+
+A heavy day, dominated by the user-curated queue: STEP 2b pulled in four self-flagged arXiv preprints, while the Scholar-alert side contributed exactly one EMSE-published static-analysis tool. The four user-picked papers cluster tightly around the same architectural recipe — **multi-agent orchestration with structural feedback grounded in deterministic…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-04-29](reports/2026-04-29/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 2</span><span class="chip borderline">Borderline 0</span></div>
 
