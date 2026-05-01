@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-05-01](reports/2026-05-01/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 1</span><span class="chip keep">Keep 2</span><span class="chip borderline">Borderline 1</span></div>
+
+A four-paper Scholar-alert day with no user-curated picks. The day's clear standout is **AnalysisAgent** (Bouzenia, Cadar, Pradel — CISPA + Imperial), which formalises *automated software analysis* as an end-to-end agentic task and presents both a benchmark (AnalysisBench: 35 tool–project pairs across AFL++, KLEE, CSA, cflow, Infer, WALA, SJK on five…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-04-30](reports/2026-04-30/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 2</span><span class="chip keep">Keep 2</span><span class="chip borderline">Borderline 1</span></div>
 
