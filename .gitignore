@@ -30,3 +30,8 @@ __pycache__/
 # Private archive — full uncensored reports including Bypass/Remove evaluations
 # and any other content we deliberately keep out of the public Pages site.
 .private/
+
+# Sandbox FUSE-mount leftovers — git filter-branch / lock-file backups that the
+# sandbox cannot unlink. Safe to ignore; cleaned up on next host-side `git gc`.
+.git-rewrite/
+.git-rewrite.bak.*/
