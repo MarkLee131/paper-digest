@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-05-02](reports/2026-05-02/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 1</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
+
+A quiet alert window today: only one fresh paper makes it through to deep-read, and it is a **user-flagged self-email** rather than a Scholar alert. The day's Outstanding paper, **VulWeaver** (Cao, Chen, Hu, Bihuan Chen and collaborators at Fudan University and Huawei), targets the same Java vulnerability-detection terrain that **Phoenix** mapped…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-05-01](reports/2026-05-01/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 1</span><span class="chip keep">Keep 2</span><span class="chip borderline">Borderline 1</span></div>
 
