@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-05-03](reports/2026-05-03/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 2</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
+
+Two Outstanding deep-reads today, both arriving via followed-researcher Scholar alerts (no user-curated self-emails landed inside the window). The first, **NeuroTaint** (Cai, Tang, Wen, Qin — HKUST + Xidian), reframes information-flow tracking for LLM agents around three orthogonal propagation classes — *explicit content propagation*, *implicit control…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-05-02](reports/2026-05-02/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 1</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
 
