@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-05-04](reports/2026-05-04/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
+
+An **empty alert window**. No new Scholar-alert threads landed in the last 24 hours, and no user-curated self-emails were forwarded for review either. The most recent Scholar batch resolves to 2026-05-02 — already absorbed into the 2026-05-03 report (NeuroTaint and CoRE) — and the most recent user-curated paper is from 2026-05-01. A broader fallback…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-05-03](reports/2026-05-03/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 2</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
 

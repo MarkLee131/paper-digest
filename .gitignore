@@ -35,3 +35,11 @@ __pycache__/
 # sandbox cannot unlink. Safe to ignore; cleaned up on next host-side `git gc`.
 .git-rewrite/
 .git-rewrite.bak.*/
+
+# Pandoc intermediate HTML staged inside the daily report dirs because the
+# sandbox FUSE mount cannot delete files. Safe to ignore; the .pdf is the
+# real deliverable.
+docs/reports/*/_pub.html
+docs/reports/*/_pub.html.bak.*
+docs/reports/*/_priv.html
+
