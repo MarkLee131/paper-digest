@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-05-06](reports/2026-05-06/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 2</span><span class="chip keep">Keep 2</span><span class="chip borderline">Borderline 0</span></div>
+
+Two Outstanding deep-reads land today, the second of which is the day's user-curated pick. **DirtyFree** (Lee, Kwon, Holz — Max Planck Institute for Security and Privacy + Theori, NDSS 2026) collapses the three-stage Data-Oriented Programming exploit chain — heap-leak / arbitrary-address-read / arbitrary-address-write — into a *single* arbitrary-free…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-05-04](reports/2026-05-04/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
 
