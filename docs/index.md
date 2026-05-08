@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-05-08](reports/2026-05-08/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 3</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 1</span></div>
+
+Four papers landed in the window today and three of them clear the Outstanding bar — an unusually dense day that runs deliberately wide rather than deep on a single thread. **GONDAR** (Fleischer, Zhang et al., Georgia Tech / Samsung / Waterloo, arXiv 2604.01645) is the day's headline result: a sink-centric Java fuzzing framework that orchestrates two LLM…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-05-07](reports/2026-05-07/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
 
