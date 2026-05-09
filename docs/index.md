@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-05-09](reports/2026-05-09/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 2</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
+
+Today's window contained no Google Scholar alert hits but two user-curated arXiv submissions, both squarely on the *LLM-meets-program-semantics* axis and complementary in scope. **Symbolic Execution Traces (SET)** by Bayer, Zetzsche, Bouissou, Delmas, Tautschnig, and Kong (Cambridge / AWS, arXiv 2605.06184) introduces a 500-task SV-COMP-derived C…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-05-08](reports/2026-05-08/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 3</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 1</span></div>
 
