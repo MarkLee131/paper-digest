@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-05-10](reports/2026-05-10/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 3</span><span class="chip keep">Keep 1</span><span class="chip borderline">Borderline 0</span></div>
+
+Today's window surfaced four Outstanding papers from the followed-author and recommended Scholar feeds — three of which deepen the by-now-dominant pattern of **LLM driving the search, a sound non-LLM tool guarding the inner loop** that emerged on yesterday's Cottontail / SET pair. **LiveFMBench** by Xu, Cao, Mo, Hu, Wen, Lin, Han, Qin, Tian, Cheung, Sun,…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-05-09](reports/2026-05-09/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 2</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
 
