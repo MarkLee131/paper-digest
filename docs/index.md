@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-05-11](reports/2026-05-11/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
+
+An **empty alert window**. No new Scholar-alert threads landed in the last 24 hours, and no user-curated self-emails were forwarded for review either. The most recent Scholar batch resolves to 2026-05-09 16:40 UTC — ten threads already fully absorbed into the 2026-05-10 report (LiveFMBench, EvoPoC, Semantic Reification, RSafe, plus five off-topic skips).…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-05-10](reports/2026-05-10/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 3</span><span class="chip keep">Keep 1</span><span class="chip borderline">Borderline 0</span></div>
 
