@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-05-12](reports/2026-05-12/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
+
+Today's window surfaced one paper, both via a followed-author alert and via the recommendation engine — the dual-source signal is itself unusual enough to note. **Code Language Models for Security Patch Management: How Far Are We?** by Lin, Cao, Yu, Sun, Xiao, Xue, Wu, Ren, and Lo (Zhejiang University + NJUPT + Nanjing University + Yangzhou University +…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-05-11](reports/2026-05-11/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
 
