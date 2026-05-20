@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-05-21](reports/2026-05-21/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 1</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
+
+Today's window surfaced one **Recommended articles** Scholar-alert thread containing two papers. One is an Outstanding deep-read — **"It's Not You, It's Me: Reevaluating the Relationship between Concolic Execution and Fuzzing"** by Dresel, Pletinckx, Gritti, Payer, Vigna, and Kruegel (UC Santa Barbara + EPFL) at *EuroS&P 2026* — which builds **SYMCTS**,…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-05-12](reports/2026-05-12/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
 
