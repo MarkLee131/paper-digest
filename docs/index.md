@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-05-23](reports/2026-05-23/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 3</span><span class="chip keep">Keep 3</span><span class="chip borderline">Borderline 1</span></div>
+
+Today's window surfaced five Scholar-alert threads carrying thirteen distinct paper candidates; seven cleared Stage-1 triage after the preference-aware filter (preprint posterior 0.75 promoted three otherwise-borderline arXiv items), and three came in on the followed-researcher signal. The three Outstanding deep-reads share a common thread — **letting…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-05-22](reports/2026-05-22/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 2</span><span class="chip keep">Keep 1</span><span class="chip borderline">Borderline 0</span></div>
 
