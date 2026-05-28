@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-05-28](reports/2026-05-28/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 1</span><span class="chip keep">Keep 1</span><span class="chip borderline">Borderline 0</span></div>
+
+Two flagged-author alerts and one Scholar-Recommended batch in the 24-h window. Both flagged papers land in the **fuzzing / model-based testing** axis from opposite ends of the analysis stack: a CAV '26 paper from Qingkai Shi's group on *inferring sound and precise symbolic finite automata* for stateful systems, and an ICST '26 paper from Andreas…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-05-27](reports/2026-05-27/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
 
