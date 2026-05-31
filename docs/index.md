@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-05-31](reports/2026-05-31/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 2</span><span class="chip keep">Keep 3</span><span class="chip borderline">Borderline 0</span></div>
+
+A larger-than-usual eight-candidate batch arrived in the 24-h window: four flagged-author alerts (Zhendong Su, David Lo, Michael Pradel, Shengchao Qin) and one Scholar-Recommended batch carrying four more. Two papers land as Outstanding: an ETH Zurich performance-bug-finding paper that introduces **Branch Flip Analysis** as a white-box methodology for…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-05-28](reports/2026-05-28/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 1</span><span class="chip keep">Keep 1</span><span class="chip borderline">Borderline 0</span></div>
 
