@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-06-01](reports/2026-06-01/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 1</span><span class="chip keep">Keep 4</span><span class="chip borderline">Borderline 0</span></div>
+
+A six-candidate batch deep-read out of ten alerts in the 24-h window — four flagged-author hits (Lingming Zhang, Gelei Deng, Danqi Chen, Zhiqiang Lin) and one Scholar-Recommended thread carrying six more, with overlap deduplicated. The day's clear Outstanding is **SEC-bench Pro** (Lingming Zhang et al.), a 183-instance benchmark for agent bug hunting on…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-05-31](reports/2026-05-31/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 2</span><span class="chip keep">Keep 3</span><span class="chip borderline">Borderline 0</span></div>
 
