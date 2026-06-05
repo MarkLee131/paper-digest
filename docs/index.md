@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-06-05](reports/2026-06-05/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 1</span><span class="chip keep">Keep 1</span><span class="chip borderline">Borderline 0</span></div>
+
+A thin three-alert window, but the central hit is on-target. The Outstanding paper is **Jaralyzer** (ICSE 2026, Schott et al., Paderborn + SAP + Fraunhofer IEM), the first OSS-dependency scanner that operates directly on Java *bytecode* — closing the long-standing source-vs-bytecode mismatch that has limited Eclipse Steady's coverage. On the unmodified…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-06-01](reports/2026-06-01/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 1</span><span class="chip keep">Keep 4</span><span class="chip borderline">Borderline 0</span></div>
 
