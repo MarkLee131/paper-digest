@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-06-06](reports/2026-06-06/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 1</span><span class="chip borderline">Borderline 0</span></div>
+
+A thin three-alert window with no fresh Outstanding hit. Two of three alerts are deferred at Stage-1: one is off-topic for the program-analysis / vulnerability-detection focus, and the other is a Paderborn-hosted re-listing of the same Jaralyzer / bytecode-centric Java SCA work that shipped as yesterday's [Outstanding](../2026-06-05/) — same author,…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-06-05](reports/2026-06-05/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 1</span><span class="chip keep">Keep 1</span><span class="chip borderline">Borderline 0</span></div>
 
