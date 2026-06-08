@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-06-08](reports/2026-06-08/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 1</span><span class="chip keep">Keep 3</span><span class="chip borderline">Borderline 4</span></div>
+
+A lighter, more diverse window than yesterday's Cheng / Sui burst. The Outstanding slot goes to a **Fudan ACM TOSEM** paper, *CoCoPat*, that targets the long-running "noisy patch" problem: vulnerability patches mixing critical fixes with refactors degrade every downstream tool that consumes them, and CoCoPat's two-phase *filtering-then-recovering* LLM…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-06-07](reports/2026-06-07/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 2</span><span class="chip keep">Keep 3</span><span class="chip borderline">Borderline 3</span></div>
 
