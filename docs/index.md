@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-06-09](reports/2026-06-09/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 1</span><span class="chip borderline">Borderline 3</span></div>
+
+A small, quiet window. The Keep slot goes to a Shengchao-Qin-group preprint that re-frames LLM code-readability steering as a **multitask representation-engineering** problem under multidimensional orthogonal constraints (MOC-JPCA), with two formal theorems bounding the readability gain (lower) and the correctness loss (upper). The bounded-tradeoff…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-06-08](reports/2026-06-08/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 1</span><span class="chip keep">Keep 3</span><span class="chip borderline">Borderline 4</span></div>
 
