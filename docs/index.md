@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-06-10](reports/2026-06-10/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
+
+Quiet window — zero net-new candidates. The only Gmail matches in the last 24 h are the three Scholar-alert threads delivered at 03:17 UTC yesterday, which were already triaged, deep-read, and reported in the [2026-06-09 digest](../2026-06-09/). No user-curated self-emails landed; no author-exclusion-list hits. The next Scholar batch is expected at…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-06-09](reports/2026-06-09/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 1</span><span class="chip borderline">Borderline 3</span></div>
 
