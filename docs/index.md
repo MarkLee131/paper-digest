@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-06-11](reports/2026-06-11/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 1</span><span class="chip keep">Keep 2</span><span class="chip borderline">Borderline 1</span></div>
+
+A focused window with one strongly Outstanding entry and two solid Keeps. **Veritas** (UCL / BynarIO / Columbia) is a three-stage hybrid pipeline for binary memory-corruption vulnerability detection that strictly brackets the LLM between a deterministic LLVM-IR slicer and a multi-agent debugger-grounded validator; on 20 ground-truth BMCVs across 10…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-06-10](reports/2026-06-10/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
 
