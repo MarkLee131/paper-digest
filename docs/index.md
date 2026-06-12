@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-06-12](reports/2026-06-12/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
+
+Zero-volume day. No new Google Scholar alert email arrived in the 24 h window, and no self-curated paper email was forwarded either. The four candidates that *are* in the inbox (the Princeton *WEBGRAPHMIX* preprint from Danqi Chen's group, UCL/BynarIO/Columbia *Veritas*, UCLouvain *PROSE+MUSE*, and the *RULEDROID* IEEE Transactions piece) all came in on…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-06-11](reports/2026-06-11/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 1</span><span class="chip keep">Keep 2</span><span class="chip borderline">Borderline 1</span></div>
 
