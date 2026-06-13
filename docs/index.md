@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-06-13](reports/2026-06-13/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 1</span><span class="chip keep">Keep 3</span><span class="chip borderline">Borderline 1</span></div>
+
+A high-yield day. The Outstanding pick is **EffiSkel** (PACMPL FSE 2026, CC BY), a multi-task framework that explicitly supervises the *structural skeleton* of efficient code — three complementary extractors (token-level SMS, AST-level SSS, time-aware TAS) plus three jointly-trained losses; on Mercury with DeepSeek-Coder-6.7B it lifts Efficiency Ratio by…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-06-12](reports/2026-06-12/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
 
