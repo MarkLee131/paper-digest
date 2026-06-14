@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-06-14](reports/2026-06-14/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 1</span><span class="chip keep">Keep 3</span><span class="chip borderline">Borderline 1</span></div>
+
+A type-systems-and-program-analysis day. The Outstanding pick is **Sotiropoulos & Su's error-enumeration framework for type analyzers** (PACMPL OOPSLA 2026) — a clean, foundational reframing: rather than fuzzing well-typed programs and watching for crashes, *enumerate ill-typed programs by construction* (inject type mismatches at all single locations of…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-06-13](reports/2026-06-13/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 1</span><span class="chip keep">Keep 3</span><span class="chip borderline">Borderline 1</span></div>
 
