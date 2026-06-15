@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-06-15](reports/2026-06-15/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 1</span><span class="chip keep">Keep 1</span><span class="chip borderline">Borderline 1</span></div>
+
+A vulnerability-lifecycle day. The Outstanding pick is **ATTAIN** (Mao, Chen, Hu, Xia — Zhejiang University) — a trace-driven diff-analysis framework that retires both ends of the affected-version-labelling problem: it executes the exploit across the version chain, lets an LLM in a *finite-state tool loop* explore the resulting behavioural divergences…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-06-14](reports/2026-06-14/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 1</span><span class="chip keep">Keep 3</span><span class="chip borderline">Borderline 1</span></div>
 
