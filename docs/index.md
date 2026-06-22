@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-06-22](reports/2026-06-22/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 1</span><span class="chip keep">Keep 2</span><span class="chip borderline">Borderline 1</span></div>
+
+A *systematize-and-transfer* day. The Outstanding pick is **SoK: History Doesn't Repeat Itself, but Android Design-Level Vulnerabilities Rhyme in OpenHarmony** (Chen, Yang, Wang, Nandi, Schloegel, Bao, R. Wang, Doupé, Lin, Shoshitaishvili — ASU / CISPA / OSU; USENIX Security 2026) — the first academic systematization of Android *design-level*…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-06-15](reports/2026-06-15/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 1</span><span class="chip keep">Keep 1</span><span class="chip borderline">Borderline 1</span></div>
 
