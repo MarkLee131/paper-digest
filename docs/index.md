@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-06-24](reports/2026-06-24/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 3</span><span class="chip keep">Keep 3</span><span class="chip borderline">Borderline 0</span></div>
+
+A *make-the-tacit-explicit* day. Three Outstanding picks all win by isolating a single semantic axis and instrumenting against it. **Code-Augur** (Luo, Zafar, Wolff, Roychoudhury — NUS) turns implicit LLM-agent reasoning into in-source assertions and lets a guided fuzzer falsify them, surfacing **22 new vulnerabilities** in OSS projects using generic…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-06-22](reports/2026-06-22/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 1</span><span class="chip keep">Keep 2</span><span class="chip borderline">Borderline 1</span></div>
 
