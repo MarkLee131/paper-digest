@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-06-25](reports/2026-06-25/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
+
+A *quiet-inbox* day. Zero new Google Scholar alert threads and zero user-curated self-emails landed inside the 24 h window. The three most recent Scholar threads (Vechev's TIGER on gradient inversion, the Zibaeirad–Vieira *Calibration Without Comprehension* CWE-Top-1 study, and the Zhendong-Su-group property-based Android-DME fuzzer journal extension)…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-06-24](reports/2026-06-24/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 3</span><span class="chip keep">Keep 3</span><span class="chip borderline">Borderline 0</span></div>
 
