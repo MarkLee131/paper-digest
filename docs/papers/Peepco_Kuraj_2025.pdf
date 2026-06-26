@@ -1,0 +1,1495 @@
+Peepco: Batch-Based Consistency Optimization
+IVAN KURAJ,Massachusetts Institute of Technology, USA
+JOHN FESER, Basis, USA
+NADIA POLIKARPOVA, University of California, San Diego, USA
+ARMANDO SOLAR-LEZAMA,Massachusetts Institute of Technology, USA
+We present batch-based consistency, a new approach for consistency optimization that allows programmers to
+specialize consistency with application-level integrity properties. We implement the approach with a two-step
+process: we statically infer optimal consistency requirements for executions of bounded sets of operations, and
+then, use the inferred requirements to parameterize a new distributed protocol to relax operation reordering
+at run time when it is safe to do so. Our approach supports standard notions of consistency. We implement
+batch-based consistency in Peepco, demonstrate its expressiveness for partial data replication, and examine
+Peepco’s run-time performance impact in different settings.
+CCS Concepts: • Theory of computation→ Automated reasoning; • Software and its engineering→
+Automatic programming; Distributed systems organizing principles.
+Additional Key Words and Phrases: Distributed Systems, Integrity, Data Consistency, Program Synthesis,
+Invariants, Model Checking
+ACM Reference Format:
+Ivan Kuraj, John Feser, Nadia Polikarpova, and Armando Solar-Lezama. 2025. Peepco: Batch-Based Consistency
+Optimization. Proc. ACM Program. Lang. 9, OOPSLA1, Article 119 (April 2025), 29 pages. https://doi.org/10.
+1145/3720513
+1 Introduction
+Programmers traditionally rely on strong consistency to preserve data integrity. Strong consis-
+tency masks the intricacies of transaction execution over distributed data with unpredictable
+communication delays and concurrency, but sacrifices runtime performance [15]. Weaker consis-
+tency mechanisms offer higher performance but can cause application-level integrity violations if
+used naively [4, 71]. This is exacerbated by the fact that for some applications, in addition to the
+CAP tradeoff [29], programmers might need to trade off consistency and latency [2]. If integrity
+requirements are too strict, programmers often have no option but to sacrifice performance so
+that consistency fulfills the integrity requirements of their applications for the worst case [68].1
+Moreover, the required consistency levels are tied to the semantics of particular operations and
+distribution aspects, and any change to either of the two has to propagate changes in the consis-
+tency model through a costly development cycle [40, 72, 77, 86]. Automating this choice in such
+1This follows from the impossibility of achieving atomic consistency and availability [29]. The lesser-known PACELC
+theorem argues a fundamental trade-off between latency and consistency exists even without partitions/failures [2].
+Authors’ Contact Information: Ivan Kuraj, Massachusetts Institute of Technology, Cambridge, USA, ivanko@mit.edu;
+John Feser, Basis, New York, USA, jack@basis.ai; Nadia Polikarpova, University of California, San Diego, San Diego, USA,
+npolikarpova@ucsd.edu; Armando Solar-Lezama, Massachusetts Institute of Technology, Cambridge, USA, asolar@csail.
+mit.edu.
+This work is licensed under a Creative Commons Attribution 4.0 International License.
+© 2025 Copyright held by the owner/author(s).
+ACM 2475-1421/2025/4-ART119
+https://doi.org/10.1145/3720513
+Proc. ACM Program. Lang., Vol. 9, No. OOPSLA1, Article 119. Publication date: April 2025.
+119:2 Ivan Kuraj, John Feser, Nadia Polikarpova, and Armando Solar-Lezama
+a setting, and the subsequent implementation, while attaining high-level integrity provided by
+strong consistency, remains a challenge.
+Prior work has proposed using static analysis to identify when operations are allowed to execute
+under weak consistency to optimize performance for a large class of applications [4, 30, 36, 37, 40, 68].
+However, the employed static analyses are conservative, as they have to account for the potential
+worst-case that might occur at run time. In this paper, we present an automated approach that uses
+symbolic reasoning over executions of a bounded number of operations to derive efficient checks
+that attempt to weaken the reordering of concurrent operations at run-time. Our approach provides
+two key advantages over the purely static approach. First, we can exploit fine-grained optimization
+opportunities that only occur in specific situations at run time. Existing techniques must revert
+to strong consistency whenever an interleaving of operations that violates integrity exists, even
+when those operations are not invoked together at runtime. Second, the verification burden of
+our approach is smaller than other approaches that must verify that the chosen consistency level
+maintains integrity for all possible inputs and unbounded interleavings. Instead, our approach
+checks that integrity is maintained for bounded executions and uses this information and the
+dynamic information obtained from the run-time checks to perform optimization safely and
+profitably.
+To better facilitate our consistency optimization strategy, we introduce batch-based consistency,
+which defines a specialized consistency model given a set of semantic properties. Batch-based
+consistency is parameterized over two kinds of application-specific integrity properties—safety
+and congruence—and generates a specialized consistency model that restricts the system’s states. A
+safety property must be held in every state. A congruence property must be restored periodically
+after a finite number of state changes. (Extending the property of replicas converging to the same
+state used in prior work [36, 68].) Programmers specify the desired level of consistency by specifying
+the two kinds of integrity properties, picking a point between eventual and strong consistency. This
+allows programmers to limit the discrepancy of states between nodes at any point and weakens the
+strict notion of state convergence (all nodes have to see the effects of distributed operations in the
+same order as if a sequential execution produced the effects), introducing opportunities for relaxing
+orderings of operations at run time. Consistency optimization can then optimize consistency at
+run time, as long as the execution maintains the specified integrity properties.
+Batch-based consistency optimization.We implement our approach (batch-based consistency
+optimization) in the Peepco tool. Peepco takes the definition of a sequential object, data allocation
+specification, and integrity properties defined as predicates on the object state, and synthesizes
+a message-passing implementation that respects the allocation specification and executes object
+methods as distributed operations. Peepco infers consistency requirements from the specification
+and allocates data, splits and allocates computation, and integrates the results into our new run-time
+protocol, to implement the batch-based consistency model with the specified integrity.
+Our approach relies on a statically constructed oracle that determines if an operation can safely
+execute given dynamic information about the operations running in the distributed system. Our
+strategy relies on the insight that if we have such an oracle, we can use standard techniques
+for distributed agreement [31] to relax consistency. (Such techniques implement the consensus
+abstraction, which allows nodes to propose and agree on values.) Once all nodes agree on the
+operations that can be executed concurrently, they can be executed in any order the oracle deems
+safe. The oracle is then used to implement batched execution: given the set of operations in a batch,
+a new operation is allowed to execute in the batch only if: 1) the oracle allows it to run concurrently,
+and 2) it follows execution order concerning other operations in the batch, as specified by the
+oracle.
+Proc. ACM Program. Lang., Vol. 9, No. OOPSLA1, Article 119. Publication date: April 2025.
+Peepco: Batch-Based Consistency Optimization 119:3
+The strategy uses a new run-time distributed algorithm—PeepCommit—which operates in batches
+and uses the oracle to add as many non-conflicting operations to a batch as possible, falling back
+to strong consistency when the batch might contain conflicting operations. We present both a
+blocking and a non-blocking protocol that implement the strategy, where the latter supports
+resiliency to node crashes at a performance cost. All nodes in the system consult the same oracle
+locally while maintaining safety and restoring congruence at the end of each batch. The correctness
+and performance of the strategy directly depend on the set of relaxed orderings known to the
+oracle. To construct the oracle, we introduce integrity-driven consistency strengthening, a new SMT-
+based bounded symbolic analysis algorithm for consistency inference for batch-based consistency.
+The algorithm discovers the consistency requirements of bounded execution traces of operations
+derived from sequential objects at compile time. Our algorithm is efficient; it incrementally builds a
+set of consistency requirements and uses them to aggressively prune the set of execution traces
+to explore, in addition to using traditional symmetry-breaking techniques. The efficient analysis
+allows us to explore traces up to nontrivial bounds, even when the integrity invariants allow
+many operation reorderings. While the bounded nature of our analysis means that it can miss
+optimization opportunities, it will not lead to unsound executions.
+In addition to full replication (where all nodes replicate the application state), we extend our
+approach to support partial replication, where some parts of the application data are split among
+nodes and others are replicated [11]. Partial replication is often a requirement for modern dis-
+tributed applications, which rely on sharding and fine-grained allocation on the backend to achieve
+security and performance [72]. It also enables “local-first” applications on the front end [41]. Partial
+replication introduces new opportunities for optimization, which Peepco can take advantage of.
+Target applications. Not all applications can benefit from our approach. For a large class of
+applications that can satisfy integrity with weak consistency, Peepco will pay an unnecessary
+performance penalty when running its coordination-based protocol, as shown in § 6. We show how
+Peepco’s static analysis results can suggest to programmers to try using weak consistency ([68])
+and avoid penalties if possible (§ 3).
+However, the border around the mentioned class is thin. For example, consider the well-studied
+bank account example [36, 68] with a replicated balance that prevents overdrafts. The example
+admits weak consistency optimizations. As deposits and withdrawals commute, delivering them
+in any order will ensure that replicas converge to the same local balance. Withdrawals cannot be
+executed concurrently, to prevent overdraft, but deposits can be freely interleaved with either of
+the two operations, as they increase the balance: this can bring significant speedups [68]. However,
+if an interest operation is introduced, which increases the balance based on a given percentage, the
+application no longer admits weak consistency optimization. Namely, executing deposits can no
+longer proceed to freely interleave, as they do not commute with interest. For such cases, a static
+analysis must conservatively resort to strong consistency for all involved operations to prevent bad
+reorderings. However, if interest operations are rare (likely), often only deposits and withdrawals
+will be executed concurrently, for which reordering is allowed. Peepco exploits such cases, by
+detecting and allowing reordering at run time.
+As causal consistency often remains one of the strongest consistency models that remain avail-
+able during system partitions [5], optimizing consistency for such applications remains a challenge,
+leaving developers with no option but to forego latency, to satisfy the integrity, of their applica-
+tions [2]. These applications are the focus of our approach: Peepco pays for the cost of coordination
+that might be nevertheless hard to avoid, but still relaxes concurrency and orderings of operations
+to improve performance based on the dynamic information across nodes at run time.
+Limitations. Prior work has demonstrated optimization in the space of a wide variety of
+consistency notions [37, 73]. Similarly to prior work [22, 36, 49–51], however, we limit our work to
+Proc. ACM Program. Lang., Vol. 9, No. OOPSLA1, Article 119. Publication date: April 2025.
+119:4 Ivan Kuraj, John Feser, Nadia Polikarpova, and Armando Solar-Lezama
+var bal: Int = 0
+var hist: List[(String, Int)] = []
+def deposit(amt: Nat) {
+bal += amt; hist += ("d", amt) }
+def withdraw(amt: Nat) {
+if (amt ≤ bal) {
+bal -= amt; hist += ("w", -amt) }}
+Fig. 1. Bank account in Peepco Fig. 2. Execution snapshot Fig. 3. Specialized model
+a few standard consistency notions and prioritize cleanly presenting the novel dynamic batch-based
+consistency optimization strategy. We leverage the existing idea of consistency lattice and adopt
+the basic consistency lattice traditionally used for full replication [22, 36, 37, 68], but extend our
+approach with partial replication and new consistency notions specific to it.
+Contributions. In summary, this paper makes the following contributions:
+• Batch-based consistency (§ 3), a new approach for specializing consistency models.
+• A strategy for consistency optimization in batch-based consistency, consisting of (1) the PeepCom-
+mit protocol (§ 3.5), a new round-based distributed algorithm that relaxes consistency constraints
+within bounded sets of concurrently invoked operations while maintaining integrity, and (2) the
+integrity-driven consistency strengthening algorithm (§ 3.6), an efficient, symbolic, bounded static
+analysis that determines the weakest set of consistency constraints under which operations in
+the given set are safe to reorder.
+• An extension of the strategy for consistency optimization on partially-replicated data (§ 4.1).
+• An implementation of Peepco as a Scala DSL that allows programmers to orthogonally specify
+behavior, data allocation, and integrity, and an evaluation (§ 6) of Peepco on benchmarks, both
+new and drawn from prior work, that compares the performance of the resulting distributed
+implementations to relevant baselines, as well as identifies conditions under which Peepco can
+achieve significant speedups.
+2 Motivation
+We now show how developers use Peepco to synthesize an illustrative replicated application [68]
+and achieve performance and desired integrity in batch-based consistency.
+Distributedmodel.We consider a bank account object (Fig. 1), which we have adopted from [68],
+that has a balance bal and an ordered history hist that tracks performed operations, reflecting the
+value in bal when reduced, as shown later. The object has three methods: deposit, withdraw,
+and interest. The methods modify bal accordingly and record operations by adding entries
+to hist. In addition, withdraw performs a check to avoid overdrafting the account. We define
+interest subsequently.
+We deploy the bank account as a distributed application where the object is replicated onto the
+nodes 𝑛1 and 𝑛2. Let us consider execution when Peepco’s consistency optimization is not applied.
+Clients invoke methods, which then get dispatched to arbitrary nodes. Fig. 2 shows a client that calls
+withdraw twice: the first is dispatched to 𝑛1 and the second to 𝑛2. After a replica receives a call, it
+produces an effect (a state update function, closed over the parameters), applies the effect locally,
+and propagates it to other replicas over the network.2 Here, starting with the state bal:100 and
+hist:[(d,100)], withdraw(80) is dispatched to 𝑛1, the overdraft check passes, so 𝑛1 produces
+and applies the effect bal-=80 locally, resulting in bal:20. Fig. 2 shows this intermediate state
+where the effect was sent to 𝑛2 (shown with a dashed line). If the effect bal-=80 reaches 𝑛2 before
+2We adopt the operation-centric model of replication with effect propagation [16, 37, 40, 49, 66, 68].
+Proc. ACM Program. Lang., Vol. 9, No. OOPSLA1, Article 119. Publication date: April 2025.
+Peepco: Batch-Based Consistency Optimization 119:5
+the second call withdraw(50) is issued, 𝑛2’s bal is updated to 20, before the overdraft check of
+the call fails, producing no effects. However, if withdraw(50) is issued concurrently, its check
+passes, and a second effect bal-=50 will be applied at 𝑛2 and sent to 𝑛1. When both effects are
+applied, on 𝑛2, the account becomes overdrafted (state bal:-30, hist:[(w,-50);(w,-80)]).
+While both effects pass the local overdraft check, cumulatively they subtract more from bal than
+is available. The overdrafted state is caused by reordering due to concurrent executions, and we
+want to avoid it at all times, on all nodes.
+Now we consider the interest operation, which sets bal to a percentage x of the current bal
+value: bal * x / 100. A concurrent invocation of interest with deposit or withdraw cannot
+cause an overdraft but might result in different values of bal on different replicas, as the methods
+are not commutative. After all methods finish their execution, we would like bal, and the value
+reflected by hist (but not the structure), to be the same across all nodes.
+To eliminate such executions, we could use strong consistency [2, 33]. Prior approaches for
+optimizing consistency in the eventual consistency model [37, 68] require replicas to converge
+to equal values and thus would force strong consistency to prevent reordering in hist. Static
+consistency optimization approaches [36, 37, 68] need to assign strong consistency to all non-read
+method calls to ensure equal copies of bal, due to interest not being commutative with any of
+the other two methods. However, this eliminates concurrent executions even when concurrency
+is safe, e.g., multiple deposits or calls to interest in a row. In contrast to prior work, Peepco
+specializes the consistency model to allow safe concurrent executions by dynamically optimizing
+consistency, falling back to strong consistency only when necessary.
+Batch-based consistency.We specify integrity properties (Fig. 4) with Peepco’s Scala embedded
+DSL. First, we replicate bal and hist on all nodes in the system (variable N). Then, we define
+a safety property: bal and the fold of hist are always non-negative. The syntax bal[n] refers
+to the local copy of bal on node n. Finally, we define a congruence property: copies of bal and
+sums over hist (by the sum fold function, starting from 0) are equal in congruent states. (sum
+simply sums the second element of each pair in the given list, by folding with the start value of 0,
+i.e., sum(l: List[(String, Int)]) = l.map(_._2).sum.) Note that this property requires
+equality only between all replicated bal, but not hist.
+Using these properties, Peepco generates a distributed program that executes methods in batches,
+according to the specified integrity. Methods within a batch may be executed concurrently as
+long as all safety properties are maintained and congruence is restored at the end of the batch.
+Fig. 3 shows an execution trace; points on the trace where safety properties hold are highlighted
+in yellow and points where congruence properties hold are highlighted in blue. Method calls
+being dispatched are depicted with a star (they do not immediately start executing), with brown,
+red, and green designating interest, withdraw, and deposit, respectively. Peepco prevents
+concurrent executions of withdrawals, due to safety, and concurrent withdraw and interest
+calls, as such executions could lead to divergent bal, i.e., states that violate congruence. In the trace,
+withdraw and interest are invoked concurrently, but the withdraw is deferred to the second
+batch, where it executes concurrently with a deposit. Due to congruence not requiring equality
+between replicated hist, the system will allow interleaving executions of multiple deposit and
+interest in the same batch (e.g., when either of the two operations is invoked repeatedly in a
+sequence). Any reordering between these operations cannot violate congruence due to commuting
+between themselves.
+Batch-based consistency is implemented using PeepCommit, a new run-time protocol for batched
+execution. Fig. 5 shows the interaction between the generated code and PeepCommit in the second
+batch, where withdraw is invoked after the node had already seen deposit. Upon invoking
+withdraw, the node invokes PeepCommit to check with the other nodes whether withdraw can
+Proc. ACM Program. Lang., Vol. 9, No. OOPSLA1, Article 119. Publication date: April 2025.
+119:6 Ivan Kuraj, John Feser, Nadia Polikarpova, and Armando Solar-Lezama
+replicate({bal, hist}, N) bal-=120
+𝑛1
+safe ∀n ∈ N. def i1 =
+bal[n] ≥ 0 && sum(hist[n]) ≥ 0
+𝑛2
+bal+=20
+congr ∀na, nb ∈ N. def i2 =
+bal[na] == bal[nb] &&
+𝑛3
+sum(hist[na]) == sum(hist[nb]) bal+=20 ✔: bal-=120
+Fig. 4. Peepco specification Fig. 5. Run-time calls Fig. 6. Causal ordering
+be added to the current batch, and with the oracle under which order it needs to execute with respect
+to deposit that is already in the batch. After all nodes agree to add withdraw into the batch, the
+oracle mandates withdraw execute under causal ordering to prevent safety violations as explained
+later. (This means withdraw can be delivered on other nodes, only after all causally-dependent
+operations [46].) Message handlers generated by Peepco then execute it locally and propagate its
+effect to other nodes, using consistency protocols provided by Peepco’s run-time.
+Peepco obtains the oracle by symbolically exploring all bounded execution traces, based on the
+given sequential object and the specification. When Peepco detects an integrity violation, such as
+in the overdraft scenario in Fig. 2, it analyses the trace and concludes the bad trace can be prevented
+by disallowing concurrent executions and enforcing strong consistency (total order) of withdraw
+and their effects. Peepco continues exploring new traces, pruning all those that concurrently invoke
+withdraw. It then finds another violation of safety (Fig. 6) and concludes withdraw effects need to
+be delivered in the causal order with respect to deposit in the same batch [46] (as, e.g., withdraw
+effect -120 can depend on the particular amount deposited already, 20). The violation can be
+prevented by enforcing strong consistency between the two methods, but that would be more
+restrictive. Peepco supports weak, causal, and strong consistency orders. Once Peepco explores all
+traces for a bounded set of operations, it synthesizes an oracle that is used by PeepCommit.
+3 Batch-Based Consistency
+In this section, we define batch-based consistency. In batch-based consistency, consistency is
+defined relative to an integrity specification, which asserts application-specific invariants. We show
+how our consistency optimization procedure produces a distributed object implementation that
+leverages a run time protocol, to allow methods to be executed concurrently and ordered differently
+on different nodes, whenever such reordering cannot violate the integrity specification, which
+increases application performance.
+3.1 Semantics of Batch-Based Consistency
+Batch-based consistency is parameterized by an integrity specification I = (I𝑆 ,I𝐶 ), where I𝑆 ,I𝐶
+are two sets of integrity invariants: safety I𝑆 and congruence I𝐶 . The invariants are evaluated
+on a global state 𝜎 of the system. Global state captures local states at each node 𝑛 ∈ Node in the
+system. A special set of node identifiers Node is the set of all nodes in the system. A global state
+𝜎 : GlobState maps nodes to local states LocalState, GlobState = Node ↦→ LocalState. A local
+state 𝑠 : LocalState maps variables Id to values, LocalState = Id →↦ Val. (We will use state to
+refer to the global state and specify locality when needed.) In our running example, the account
+balance bal is replicated, so each of 𝜎 [𝑛1] and 𝜎 [𝑛2] contains a copy of bal and hist and initially
+𝜎 = [𝑛1 → [𝑏𝑎𝑙 → 0, ℎ𝑖𝑠𝑡 → Nil], 𝑛2 → [𝑏𝑎𝑙 → 0, ℎ𝑖𝑠𝑡 → Nil]].
+Proc. ACM Program. Lang., Vol. 9, No. OOPSLA1, Article 119. Publication date: April 2025.
+Peepco: Batch-Based Consistency Optimization 119:7
+An integrity invariant is a first-order formula of the form:
+∀ 𝑘𝑛 ∈ Node . 𝑐 (𝑛) =⇒ 𝑝 (Ω(𝑛)) where Ω(𝑛) = 𝜎 [𝑛1], . . . , 𝜎 [𝑛𝑘 ], 𝜎 ∈ GlobState
+where 𝑘𝑛 ∈ Node specifies a sequence, of length 𝑘 , of node identifiers 𝑛 quantified over all nodes
+in the system Node. 𝑐 is a conjunction of equalities and inequalities over node identifiers 𝑛 which
+defines combinations of node identifiers that are used to construct parameters Ω(𝑛) for the predicate
+𝑝 . 𝑝 is a quantifier-free predicate. In our running example convergence invariant i2 has 𝑐 (𝑛) = true,
+but we could add the condition 𝑐 that requires 𝑛𝑎 ≠ 𝑛𝑏 to avoid trivial comparisons of the same
+variables, e.g., 𝜎 [𝑛𝑎] [𝑏𝑎𝑙] = 𝜎 [𝑛𝑎] [𝑏𝑎𝑙]. We use the notation 𝜎 |= 𝐼 to mean “𝐼 holds in state 𝜎 .”
+We define a state trace 𝜏 to be a sequence of states 𝜎1, . . . , 𝜎𝑛 , where 𝜎𝑖 ∈ GlobState. The trace
+characterizes an execution in which a node 𝑛𝑥 in the system goes exactly through the sequence of
+states 𝜎1 [𝑛𝑥 ], . . . , 𝜎𝑛 [𝑛𝑥 ]. Next, we define a “satisfies” relation between traces 𝜏 and different kinds
+of invariants 𝐼 .
+Definition 1 (Safety invariant). 𝐼 is a safety invariant on a trace 𝜏 (denoted 𝜏 |=𝑠 𝐼 ) if it holds
+on every state in 𝜏 , i.e., 𝜏 |=𝑠 𝐼 ≡ ∀𝜎 ∈ 𝜏 . 𝜎 |= 𝐼 .
+Definition 2 (Congruence invariant). 𝐼 is a congruence invariant on a trace 𝜏 = 𝜎1, . . . , 𝜎𝑛
+(denoted 𝜏 |=𝑐 𝐼 ) if for every 𝜎𝑖 , 𝐼 holds on 𝜎𝑖 or some other state that follows 𝜎𝑖 in the trace, i.e., 𝜏 |=𝑐
+𝐼 ≡ ∀1 ≤ 𝑖 ≤ 𝑛. ∃𝑖 ≤ 𝑗 ≤ 𝑛. 𝜎 𝑗 |= 𝐼 .
+We lift safety and congruence to sets of invariants: a trace 𝜏 satisfies a set of safety invariants I𝑆
+(resp. congruence I𝐶 ) iff 𝜏 |=𝑠 𝐼 (resp. 𝜏 |=𝑐 𝐼 ) for every 𝐼 ∈ I𝑆 (resp. 𝐼 ∈ I𝐶 ). For any point in the
+trace, congruence must be restored at some point after (it holds “always eventually” [62]). 𝐶I (𝜏)𝐶
+denotes the set of congruent states of 𝜏 ; 𝜎 ∈ 𝐶I (𝜏) iff 𝜎 |= I𝐶 .𝐶
+An integrity specification I = (I𝑆 ,I𝐶 ) holds on a trace 𝜏 (denoted 𝜏 |= I) if 𝜏 |=𝑠 I𝑆 and 𝜏 |=𝑐 I𝐶 .
+An integrity specification holds on a system if it holds on every trace that the system exhibits. A
+system or trace where an integrity specification holds is “correct.” In our example, a correct system
+exhibits only traces where bal are always non-negative and replicas periodically restore a state
+with values of bal and folded hist equal across replicas.
+Operation execution. The definitions of integrity given so far in this section do not account for
+operation execution. Operations represent methods of distributed object definitions. We use the
+terms operation and method, as well as call and invocation, interchangeably and clarify depending
+on the context. For example, strong consistency models such as linearizability guarantee that, if an
+operation is considered to be executed, there exists a linearizability point where the operation’s
+effects are accounted for on every node [34]. However, eventual consistency is less strict. An
+arbitrary number of operations might finish executing, while nodes might never reach a congruent
+state (replicas having the same state) [65]. (This scenario can occur e.g., if operations keep being
+invoked in the system indefinitely often.) Models of batch-based consistency account for places
+where the invoked operations are considered to be finished and require convergence to be restored
+regardless of the number of other operations that might be invoked concurrently.
+Given a trace 𝜏 = 𝜎0, . . . , 𝜎𝑛 and an operation call 𝑜 , we define two state indexes: its invocation
+state start𝜏 (𝑜) and its finish state finish𝜏 (𝑜). (For simplicity, our goal is to define consistent execu-
+tions orthogonal to, potentially involved, operational semantics.) A operation call 𝑜 executed in 𝜏
+if 1 ≤ start𝜏 (𝑜) ≤ finish𝜏 (𝑜) ≤ 𝑛. Operation calls are unique and represent operation types being
+invoked at specific points in time. For a set of operation calls 𝑂 , the finish state is the finish state
+of the last call, i.e., finish𝜏 (𝑂) = 𝑙 , where ∀𝑜 ∈ 𝑂.finish𝜏 (𝑜) ≤ 𝑙 . On a particular node 𝑛𝑥 , a call 𝑜 is
+considered finished if all of the execution effects of 𝑜 on 𝑛𝑥 are executed on 𝑛𝑥 . In Fig. 6, at the end
+of the given execution, the call deposit(20) (of type deposit) has finished, as all of its effects
+were propagated and executed on all nodes, while withdraw(120) has not.
+Proc. ACM Program. Lang., Vol. 9, No. OOPSLA1, Article 119. Publication date: April 2025.
+119:8 Ivan Kuraj, John Feser, Nadia Polikarpova, and Armando Solar-Lezama
+We now constrain states in which congruence has to be restored. We say a trace 𝜏 is B(I)-
+consistent for operations 𝑂 if and only if 𝜏 is safe and congruent, and 𝑂 finished in a congruent
+state 𝜎𝑙 , i.e., finish𝜏 (𝑂) = 𝑙 and 𝜎𝑙 ∈ 𝐶I (𝜏).𝐶
+Definition 3 (B(I)-consistency). A system is B(I)-consistent if for any set of executed operations
+𝑂 , every trace that executes 𝑂 is B(I)-consistent.
+This definition prevents any B(I)-consistent system from executing operations, i.e., making
+progress, if it cannot guarantee that the system will start converging to a congruent state. batch-
+based consistency guarantees B(I)-consistent executions. This disallows nodes from arbitrarily
+diverging in their state and requires communication between all (correct) nodes in the general case,
+thus prohibiting weaker consistency models.
+3.2 Batched Operation Execution
+We define rules for allowing operations to execute concurrently. To that end, we define the notion
+of batched execution. A batch numbering 𝜏𝐵 partitions a trace 𝜏 into contiguous sequences of states
+and assigns every state an increasing batch number, i.e., for every state 𝜎𝑖 , the following state 𝜎𝑖 can
+be assigned the same or the following sequence number 𝜏 ( 𝜏 𝜏 𝜏𝐵 𝜎𝑖+1) = 𝐵 (𝜎𝑖 ) or 𝐵 (𝜎𝑖+1) = 𝐵 (𝜎𝑖 ) + 1.
+For operations 𝑂 , we then define operation mapping 𝜏𝐵 = 𝑂 →↦ 𝑁 , such that for an operation call
+𝑂
+𝑜 ∈ 𝑂 , the batch of 𝑜 is , 𝜏𝑘 𝐵 (𝑜) = 𝑘 .
+𝑂
+Definition 4. A trace 𝜏 = 𝜎0, . . . , 𝜎𝑛 is a batched execution of operations 𝑂 iff there exists a pair
+( 𝜏 𝜏𝐵 , 𝐵 ) such that the given batch numbers defined by 𝜏𝐵 , 𝜏𝐵 assigns every operation𝑜 a batch within 𝜏 ,
+𝑂 𝑂
+i.e., ∀𝑜 ∈ 𝑂. 1 ≤ 𝜏𝐵 (𝑜) ≤ 𝑛, and 𝑜 is fully executed in some batch 𝑘 , i.e., start𝜏 (𝑜) = 𝑖 ∧finish𝜏 (𝑜) = 𝑗 ,
+𝑂
+where 𝜎𝑖 , 𝜎 𝑗 are assigned the batch
+𝜏
+𝑘 by 𝐵 .
+An operation belongs to exactly one batch. The size of the 𝑘-th batch is |{𝑜 | 𝜏𝐵 (𝑜) = 𝑘}|. Strong
+𝑂
+consistency corresponds to batches of size 1. Eventual consistency, in the worst case, might exhibit
+an infinite trace with only one batch.
+We now define the notion of valid bounded executions between operations in the same batch on
+subtraces and use it as the basis for defining batched B(I)-consistent executions. Given a trace 𝜏 , I,
+and 𝑂 , let CanBatchI : 2
+𝑂 ↦→ B, where 2𝑂 denotes all subsets of 𝑂 , be a mapping that prescribes
+whether for a given subset ′𝑂 ⊆ 𝑂 , 𝜏 executes ′𝑂 , and the subtrace ′𝜏 = 𝜎start ( ′ ) , . . . , 𝜎𝜏 𝑂 finish𝜏 ( ′𝑂 ) is
+B(I)-consistent.
+Theorem 3.1. A trace 𝜏 exhibits a batched B(I)-consistent execution of a finite set of operations
+𝑂 iff there exists CanBatchI and a batched execution defined by (
+𝜏 𝜏
+𝐵 , 𝐵 ), such that all operations
+𝑂
+executed in the batch 𝜏𝑖 , 𝑂𝑖 = {𝑜 | 𝐵 (𝑂) = 𝑖 ∧ 𝑜 ∈ 𝑂}, can belong in a same batch according to
+𝑂
+CanBatchI , i.e., ∀𝑖 . CanBatchI (𝑂𝑖 ).
+Proof. The theorem holds as it relies on CanBatchI , which allows only safe executions within any
+batch and restores congruence at the end of any batch, thus assuring B(I)-consistency of the entire
+trace 𝜏 . □
+Progress and congruent reads. To capture progress, we put a finite bound on all batches,
+i.e., ∀𝑖 . 0 < |𝐵𝑖 |. Due to operations being finite, a system can map a finite number of states to a
+batch before starting a new one. Therefore, any batch eventually finishes, executing one or more
+operations concurrently. To read state, Batch-Based Consistency models support two special types
+of read operations. Safe reads return a local state from a node at any point. Congruent reads return
+a congruent state snapshot across all nodes.
+GivenI and a set of operations𝑂 , andmeans to obtainCanBatchI for𝑂 , batch-based consistency
+executes concurrent operations from𝑂 in batches, as prescribed byCanBatchI , by using its protocol
+Proc. ACM Program. Lang., Vol. 9, No. OOPSLA1, Article 119. Publication date: April 2025.
+Peepco: Batch-Based Consistency Optimization 119:9
+to achieve batched B(I)-consistent executions of 𝑂 , as explained subsequently. Such a system
+trivially supports safe reads. Congruent reads can then be supported if there is the ability to read
+the state snapshot at the end of batches (i.e., at some congruent point, as only those are guaranteed
+to satisfy congruence).
+3.3 Consistency Constraints and Lattice
+Peepco implements CanBatchI , required by batch-based consistency, by identifying bad traces
+and inferring requirements on the order of operations that would prevent those traces. We follow
+prior work [37, 68] and characterize the space of consistency models as a finite lattice, defined
+over standard notions of visibility and program order between executed operations, where the
+partial order denotes the relative strength of the models [68, 78]. We define a consistency constraint
+to be a predicate 𝑐 (𝑡1, 𝑡2) on traces that holds on valid orderings of operations of types 𝑡1, 𝑡2. A
+consistency constraint is represented by a tuple of two operation types 𝑡1, 𝑡2 and a consistency
+level 𝑙 , which we write as 𝑙 (𝑡1, 𝑡2). Peepco supports three consistency levels 𝐿𝑏 : weak, causal,
+and strong, but adding a new level is straightforward (and we do so in § 4.1). Each element of
+the lattice is a set of constraints C. We define a “weaker than” relation ⊏ between consistency
+constraints: for any operation types 𝑡1, 𝑡2,𝑤𝑒𝑎𝑘 (𝑡1, 𝑡2) ⊏ 𝑐𝑎𝑢𝑠𝑎𝑙 (𝑡1, 𝑡2) ⊏ 𝑠𝑡𝑟𝑜𝑛𝑔(𝑡1, 𝑡2). Predicates
+are not symmetric: e.g., 𝑐𝑎𝑢𝑠𝑎𝑙 (𝑎, 𝑏) says that 𝑎 needs to observe a causally preceding 𝑏. (They
+describe the rules of delivery of 𝑎 with respect to deliveries of 𝑏.) For any set of levels 𝐿, 𝑠𝑡𝑟𝑜𝑛𝑔
+(total order) and𝑤𝑒𝑎𝑘 (free reordering) are the greatest and least elements in 𝐿, respectively. We
+extend ⊏ to sets of constraints: C1 ⊏ C2 if ∀𝑒1 ∈ C1 . ∃𝑒2 ∈ C2 . 𝑒1 ⊏ 𝑒2. In our example, the set
+{𝑠𝑡𝑟𝑜𝑛𝑔(withdrawal, deposit)} prevents the given violation, but it is not the weakest that does
+so, as the causal ordering {𝑐𝑎𝑢𝑠𝑎𝑙 (withdrawal, deposit)} prevents it as well and is weaker with
+respect to ⊏. Peepco reports if an operation 𝑜 does not conflict with any other,  ′ ′𝑜 . 𝑠𝑡𝑟𝑜𝑛𝑔(𝑜, 𝑜 ),
+suggesting to programmers that 𝑜 might admit weak consistency.
+A trace 𝜏 satisfies constraints C (in other words, C holds for 𝜏) if the order of execution of
+operations in 𝜏 does not violate the ordering prescribed by consistency levels of all constraints
+𝑐 ∈ C. For example, in Fig. 6, for the given trace 𝜏 , {𝑤𝑒𝑎𝑘 (withdrawal, deposit)} holds on 𝜏 , but
+{𝑐𝑎𝑢𝑠𝑎𝑙 (withdrawal, deposit)} does not.
+Definition 5 (Feasibility). A trace 𝜏 is feasible under C, denoted 𝜏 |= ′𝑐𝑜𝑛𝑠 C, iff there exists 𝜏
+such that C holds for ++ ′𝜏 𝜏 .
+Effectively, when a trace is infeasible under a constraint C, no matter what happens after the
+point when the trace ends, C will not be satisfied. This includes any pending steps that need to be
+executed so that all operations finish executing. For example, in Fig. 6, the trace becomes infeasible
+under 𝑐𝑎𝑢𝑠𝑎𝑙 (withdraw, deposit) right after executing bal-=120 on 𝑛1, as𝑤 (120) missed and
+cannot witness the causally dependent 𝑑 (20).
+Sets of constraints C form a bounded lattice (2C ∪ ⊤,⊏) with ⊥ = ∅, and ⊤, which is stronger
+than having the strongest constraint for any two operations. ⊥ and ⊤ make all, and none, of the
+traces feasible, respectively, i.e., ∀𝜏 .𝜏 |=𝑐𝑜𝑛𝑠 ⊥ ∧ 𝜏 ̸ |=𝑐𝑜𝑛𝑠 ⊤. Given a set of traces Ω and I, we say
+C is correct, or C is a solution, if ∀𝜏 ∈ Ω. 𝜏 |=𝑐𝑜𝑛𝑠 C𝑠 =⇒ 𝜏 |= I. In our example any C that
+contains 𝑠𝑡𝑟𝑜𝑛𝑔(withdraw,withdraw) is correct for all traces that execute withdraw, as it would
+force total order between them. Additionally, C = C1 ⊔ C2 is correct for Ω = Ω1 ∪ Ω2, if C1, C2 are
+correct for Ω1, Ω2, respectively, where ⊔ standardly represents the least upper bound, i.e., a “join”.
+If C is correct, then any stronger C′ (i.e., C ⊏ C′) is also correct. For example, in Fig. 6, for the set
+containing just the shown trace 𝜏 , C = {𝑐𝑎𝑢𝑠𝑎𝑙 (withdrawal, deposit)} is correct, but also the
+stronger C′ = {𝑠𝑡𝑟𝑜𝑛𝑔(withdrawal, deposit)}. (We will describe how C is discovered in § 3.6.)
+Proc. ACM Program. Lang., Vol. 9, No. OOPSLA1, Article 119. Publication date: April 2025.
+119:10 Ivan Kuraj, John Feser, Nadia Polikarpova, and Armando Solar-Lezama
+Next, we define the notion of optimality of consistency choices in the given model. We say that
+C is optimal if: 1) there is no correct C′ such that C′ ⊏ C, or 2) C = C′ ⊔ C′′ if both C′ and C′′
+are optimal. We enforce the second condition to allow choosing a single element of the lattice as
+the solution (otherwise in the context of multiple optimal solutions, unrelated by ⊏, exist). In all
+of our benchmarks, as well as most practical programs, there is no ambiguity in terms of optimal
+solutions. (We characterize optimality in the context of batch-based consistency and a more general
+notion of optimality in Appendix B.)
+3.4 Model Guarantees
+For some invariants I, a system might not be able to efficiently implement batch-based consis-
+tency. In this section, we characterize the assumptions and components necessary for an efficient
+implementation, and the strategy used by Peepco.
+Note that the only correct C might be ⊤, thus no trace, correct under I, is feasible. (Violations
+might occur even if all operations are executed with strong consistency.) We define C𝑂 as a set of
+𝑆
+strong constraints between all operations in 𝑂 . Intuitively, if C𝑂 is not correct, integrity cannot be
+𝑆
+fixed by consistency choices.
+Definition 6 (Well-formedness). InvariantsI arewell-formed if a correct C exists and C ⊑ C𝑂 .
+𝑆
+To obtain a correct C for a set of operations, it is sufficient to explore all their traces and unify
+their solutions, across any batch 𝐵, with ⊔. However, we are interested in batches of finite size that
+can be analyzed statically. Moreover, different batch sizes might require different solutions (e.g., ,
+some violations might only be exhibited with sufficiently large batch sizes). We define a solution
+map that contains a correct C per size of the considered set of operations. A solution mapM, is
+a function that maps each integer 𝑖 to a solution C for all traces that execute subsets of 𝑂 of size
+𝑖 , i.e.,M(𝑖) = C, where C is correct for { | ′ ⊆ | ′𝜏 𝑂 𝑂, 𝑂 | = 𝑖, 𝜏 executed ′𝑂 }. A solution map of
+some order 𝑘 ,M𝑘 , is a function that maps integers 𝑖 ≤ 𝑘 to solutionsM(𝑖) and 𝑖 > 𝑘 to ⊤. For an
+optimal solution map, andM(𝑖) = C, 𝑖 ≤ 𝑘 , C is also optimal for all traces of any ′𝑂 where | ′𝑂 | = 𝑖 .
+In Fig. 2, a solution map of order 𝑘 = 2 is sufficient to concurrently execute the two operation calls.
+Definition 7. A system implements B(I)-consistent 𝑘-optimal execution, if it is B(I)-consistent,
+batched, and for any batch 𝑂𝑏 , it exhibits a trace 𝜏 that executes 𝑂𝑏 if and only if 𝜏 |=𝑐𝑜𝑛𝑠 M𝑘 ( |𝑂𝑏 |).
+We define an additional property that captures most practical systems, which states that adding
+new operations cannot make the optimal solution smaller (more permissive).
+Definition 8 (Monotonicity). Invariants I are monotonic iff 𝑂1 𝑂2𝑂1 ⊆ 𝑂2 ⇒ C ⊑ C .𝑜𝑝𝑡 𝑜𝑝𝑡
+For non-monotonic invariants, a violation with fewer operations might not be exhibited with
+more operations. This is possible for congruence: e.g., if i1was a congruence property, interleavings
+of withdraw(70) and withdraw(20) would become permissible, when deposit(x) is added if
+𝑥 ≥ 90. The invariants in our running example are monotonic. batch-based consistency guarantees
+optimality only for monotonic invariants.
+Peepco’s implementation of the model. Peepco is parameterized by 𝐿 = 𝐿𝑏 and a bound 𝑘 ,
+restricting batches to at most 𝑘 concurrent operations. Peepco derives CanBatchI (𝐵), as well as
+needLevel for causal andweak consistency, by scanning the tableM𝑘 . Specifically, for well-formed
+I, Peepco produces B(I)-consistent executions; if I are also monotonic, these executions are also
+𝑘-optimal. We discuss monotonicity and general implementation of the model in Appendix C. As
+trivial procedures and protocols exist with these properties (e.g., just enforcing strong consistency),
+we are interested in efficiency and tractability for bounds 𝑘 > 1. We describe our protocol in § 3.5
+and give an efficient procedure for computingM𝑘 in § 3.6. We extend 𝐿𝑏 for partial replication
+Proc. ACM Program. Lang., Vol. 9, No. OOPSLA1, Article 119. Publication date: April 2025.
+Peepco: Batch-Based Consistency Optimization 119:11
+Algorithm 1 B(I)-consistent Delivery (PeepCommit protocol)
+PeepCommitObject 𝑄1 receive: vote(v, c)
+request: call(C) 𝑄2 votes(c)← votes(c) ∪ {v}
+response: ret(C, V) | aborted(C) 𝑄3 if |votes(c)| = |Node| then
+Params: 𝑄4 if false ∉ votes(c) then ⊲ all voted yes
+canBatch: Set[O]→ Bool 𝑄5 if needCausal(c, ops(B)) then
+needCausal: (O, Set[O])→ Bool 𝑄6 causal-order broadcast execute(c)
+k: Int ⊲ bound else broadcast execute(c)
+Using: 𝑄7 else
+rb: ReliableBroadcast
+𝑄8 broadcast cancel(c)
+cb: CausalBroadcast
+𝑄9 issue response aborted(c)
+self : Node
+𝑅1 receive: execute(c) on rb | cb
+State:
+𝑅2 𝜎 ← update(𝜎, c)
+𝜎 : Σ = 𝜎0
+𝑅3 v← retv(𝜎, c)r: Int = 0 ⊲ round index
+𝑅4 if node(c) = self then ⊲ c issued hereB: Set[C] = ∅ ⊲ batch calls
+𝑅5 issue response ret(c, v)E: Set[C] = ∅ ⊲ executed calls
+𝑅 𝐸 ← 𝐸 ∪ {c}
+votes: C→MultiSet[Bool] = C→↦ ∅ 6
+𝑅7 checkDone()
+𝐶1 request: call(c) ⊲ operation call 𝑆1 receive: cancel(c)
+𝐶2 broadcast pr(c, r) 𝑆2 𝐵 ← 𝐵 \ {c}
+𝑃1 receive: pr(c, r’) 𝑆3 checkDone()
+𝑃2 noConflict← canBatch({𝑐} ∪ 𝑜𝑝𝑠 (𝐵)) 𝐹1 fun checkDone()
+𝑃3 if r = r’ ∧ |𝐵 |<k ∧ noConflict then 𝐹2 if 𝐵 ⊆ 𝐸 ∧ 𝐸 ≠ ∅ then
+𝑃4 reply vote(true, c) 𝐹3 r← r +1 ⊲ node enters next round
+𝑃5 𝐵 ← 𝐵 ∪ {c} 𝐹4 𝐵 ← ∅
+𝑃6 else
+𝐹5 𝐸 ← ∅
+𝑃7 reply vote(false, c)
+in § 4.1. In the remainder of the paper, we will use Peepco interchangeably for the tool and the
+approach, making additional clarifications where needed.
+3.5 PeepCommit Protocol
+In this section we present PeepCommit, a distributed blocking protocol for batch-based consistency
+that is parameterized with predicates for concurrent batching. The protocol executes operations
+concurrently in batches, where each batch includes as many non-conflicting operations as possible.
+Key idea. For each new operation call, all nodes vote on whether the operation can be added to
+the current batch. Nodes store operations they agreed on and can only vote “yes” for an operation
+if it does not conflict with any of the operations already agreed upon. If an operation is not agreed
+upon by all nodes, it aborts and can be reissued later. This ensures that no conflicting operations are
+ever simultaneously accepted (similar in operation to two-phase commit [31]). Once an operation is
+accepted, it is broadcast to be executed to other nodes, taking into account the order that preserves
+integrity. This process interleaves execution and proposals of new operations and continues while
+the batch is not full, or until some node decides to end the batch, which happens if all operations
+agreed upon finish executing on that node.
+Protocol. Our protocol description (Alg. 1) details the events that can occur in the system
+and describes how nodes respond to each event [17, 36]. The protocol is parameterized over:
+(1) canBatch, which determines which operations (type O) can conflict, (2) needCausal, which
+determines which operations need causal delivery, and (3) k, the maximum batch size. Internally,
+it uses reliable and causal broadcast primitives (rb and cb) for communication, as described
+subsequently. The protocol stores the following state on each node: the initial application state 𝛿0,
+a batch number 𝑟 , the set of agreed operations 𝐵, the set of executed operations 𝐸, and a mapping
+votes from calls to the multisets of received votes from other nodes.
+Proc. ACM Program. Lang., Vol. 9, No. OOPSLA1, Article 119. Publication date: April 2025.
+119:12 Ivan Kuraj, John Feser, Nadia Polikarpova, and Armando Solar-Lezama
+The protocol starts when an operation call is issued. For every new call request call(c) (line𝐶1),
+a proposal pr(c, r) for the call c in round r is broadcast. Unless otherwise specified, messages are
+communicated reliably, using 𝑟𝑏. (Our implementation achieves this using TCP.) When pr(c, r')
+is delivered (line 𝑃1), the receiving node votes on whether to add the call c to the batch. The call
+can only be added if the batch B is not full and the operation of the call op(c) does not conflict
+with any of the previously added calls to B (line 𝑃2). This is ensured by canBatch, which is true if
+a set of operations is safe to execute concurrently. In addition, only calls belonging to the round the
+receiving node is in, can be added (line 𝑃3); this ensures that nodes receive all votes reflecting the
+needed batch even when they are slow in advancing to the next round. The node votes by sending
+a reply vote(c, v), where v is Boolean. On a “yes” vote, it adds c to the batch.
+Upon receipt of a vote(c, v) (line 𝑄1), the node adds the vote to the set of all votes for
+the call c. Once a vote is received from every node (including self, line 𝑄3), the call is accepted
+if every vote is “yes” and aborted otherwise. To execute the call, an execute(c) message is
+broadcast. 3needCausal determines whether that broadcast needs causal ordering . Otherwise,
+regular broadcast is used and the call might be interleaved with other calls that are accepted in
+the same batch. While other nodes already have the operation in B, broadcasting the operation is
+necessary to ensure the right order of delivery, which determines the order of execution. When a
+call does not get a “yes” vote from every node, its issuer sends aborted(c) to the caller and sends
+a cancel notification to notify other nodes that the call is not part of the batch. Upon receipt of an
+execute(c) message on either rb or cb, the node executes the operation c, which updates its
+state and produces a return value v (lines 𝑅2–𝑅3). When the node is the one that originally received
+call(c), it sends a return message ret(c, v) to the caller (line 𝑅5). The node then adds the call
+to the set of executed calls E and checks if it can proceed to the next round by calling checkDone.
+Upon receipt of cancel(c) (line 𝑆1), the node removes c from its batch set B, regardless of its vote
+on c. Afterward, it calls checkDone to check if the condition to proceed to the next round is met.
+Function checkDone (lines 𝐹1–𝐹5) checks if all calls that the node agreed to execute in the current
+batch B have been executed. At least one operation needs to be executed, to prevent empty batches
+in cases where all the proposed calls get rejected. If all calls have been executed, the node advances
+to the next round. It increments the round index r and resets the batch B and executed E sets.
+Protocol properties. PeepCommit maintains the following properties:
+(1) Validity: During any batch, only non-conflicting operations are executed concurrently, and
+they are executed in the right order.
+(2) Agreement: For every round, nodes agree on the same batch of operations.
+(3) Termination: Every operation call eventually completes or aborts, exactly once.
+Proof. The protocol maintains an invariant that at any point in time, on every node, B contains
+operations that are allowed to execute concurrently, according to canBatch. Validity follows
+from this invariant and the fact that to execute an operation concurrently, every node has to vote
+“yes” on it, only after adding it to B locally, which is only possible if it’s non-conflicting. Once
+any node finishes the batch and proceeds to the next round, no more operations can be added
+to the same batch (as the node will keep rejecting their proposal). Agreement thus follows, as if
+a node votes “yes” for an operation (and adds it to its B), it will eventually get notified about its
+execution or cancellation, and will arrive at the same final B as other nodes and end the batch as
+well. Termination follows from the fact that the outcome of the operation is known after the voting
+is done, and the operation is executed locally on the issuing node. □
+3Peepco uses the standard causal broadcast abstraction 𝑐𝑏 to deliver messages in causal order, which ensures that messages
+are only delivered after any causally preceding messages. [17].
+Proc. ACM Program. Lang., Vol. 9, No. OOPSLA1, Article 119. Publication date: April 2025.
+Peepco: Batch-Based Consistency Optimization 119:13
+For simplicity, we presented the version of the algorithm that suffers from potential livelocks and
+starvation. Peepco, at run time, however, will never keep aborting the same operation indefinitely,
+as it breaks ties between conflicting operations and employs prioritization strategies based on the
+operation’s age, as described in § 5.
+Note that voting can freely execute concurrently with both: 1) voting on other operations, and 2)
+executing other operations. Concurrent voting for a given batch is only prevented by conflicting
+operations or when a node decides to finalize the batch (R7 or S3, Alg. 1), at which point voting for
+the given operations proceeds in the new round. This concurrency brings performance benefits, as
+shown in § 6. However, it can never occur that two conflicting operations get all “yes” votes (due
+to Validity).
+Correctness. Given a solutionM𝑘 for operations 𝑂 , PeepCommit implements B(I)-consistent
+live batched executions. IfM𝑘 is 𝑘-optimal, executions are 𝑘-optimal.
+Proof. The correctness follows from Validity and Agreement of PeepCommit when canBatch
+and needCausal are derived fromM, as operations maintain safety, and congruence is restored at
+the point where all nodes advance to the next round. Note that new operations cannot be accepted
+to be executed, until all nodes have advanced, thus reaching a congruent state. Progress in the
+batch-based consistency follows from Termination and the fact that only a finite set of operations
+(up to 𝑘) can be executed before the congruence property is restored. Optimality then simply
+follows from the optimality ofM𝑘 . □
+3.6 Integrity-Driven Consistency Strengthening
+In this section, we present integrity-driven consistency strengthening, which infers consistency
+constraints used by PeepCommit. The goal of the algorithm is to symbolically identify constraints
+on the ordering of bounded sets of operations (akin to [37]), support operation splitting under
+partial replication (see § 4.1), and prune for scalability.
+The idea of the algorithm is to incrementally build a consistency solution by accumulating
+constraints identified for traces that violate integrity. It explores all traces that execute an increasing
+number of concurrent operations; when it finds a trace that violates integrity, it identifies the
+weakest constraint that makes the trace infeasible. Found constraints on smaller traces are also
+used for pruning larger unexplored traces. Execution traces are checked fully symbolically with an
+SMT solver. The algorithm fully explores the given programs, taking into account different paths
+induced by the conditionals, and captures distributed semantics with execution steps, or actions,
+which represent node-local computation [28]. Specifically, the process makes sure each action
+gets executed only if the dynamic condition that enables it holds true at the point of exploration,
+accounting for all path conditions that lead to such exploration when capturing semantics of the
+trace execution (and eventual condition checking). (We defer details of distributed semantics to
+Appendix A.3.) Peepco transforms methods into DAGs of actions, together with conditions that
+enable their execution in case of branching, accounting for the propagation of effects. Peepco
+supports recursion only within actions locally. (Thus, integrity properties that require reasoning
+about loops across the DAGs to be verified, are not supported.)
+Algorithm. The algorithm (Infer) is given in Alg. 2. Infer takes nodes 𝑁 , execution step, or
+action, graphs 𝑂 , integrity invariants I, and a maximum bound 𝑘 . A bound reflects the number
+of operation calls in the system. It returns a solution of order 𝑘 , which contains the weakest set
+of constraints that prevent all violations for any number of concurrent operations, up to bound 𝑘 .
+Infer maintains a solution C𝑏 for each explored bound 𝑏 and starts by initializing each solution
+with the bottom element ⊥, the empty set of constraints, which allow any trace. Infer maintains
+a worklist Ω𝑏 for every bound 𝑏. Worklist items are tuples (𝜏𝑒 ,Next, 𝑝𝑐) of a trace of actions 𝜏𝑒 ,
+pending actions to execute Next and a path condition 𝑝𝑐 .
+Proc. ACM Program. Lang., Vol. 9, No. OOPSLA1, Article 119. Publication date: April 2025.
+119:14 Ivan Kuraj, John Feser, Nadia Polikarpova, and Armando Solar-Lezama
+Algorithm 2 Infer (Integrity-Driven Consistency Strengthening)
+Require: nodes 𝑁 , operations 𝑂 , integrity invariants (I𝑆 , I𝐶 ), bound 𝑘
+Ensure: consistency solutionM of order 𝑘
+1: 𝑆𝑖 ← ∅, for 1 ≤ 𝑖 ≤ 𝑘 , C0 ← ⊥, 𝑏 ← 1, Ω1 ← {([], Init,I𝐶 ∧ I𝑆 ) | Init ∈ Comb(𝑂, 𝑁, 1)}
+2: while 𝑏 ≤ 𝑘 do ⊲ explore worklists up to size 𝑘
+3: if Ω𝑏 ≠ ∅ then ⊲ all traces up to 𝑏 are done
+4: (𝜏𝑒 ,Next, 𝑝𝑐) ← Choose(Ω𝑏);Ω𝑏 ← Ω𝑏 \ {(𝜏𝑒 ,Next, 𝑝𝑐)}
+5: if 𝜏𝑒 ̸ |=𝑐𝑜𝑛𝑠 C𝑏 then continue ⊲ prune
+∧
+6: 𝑓valid ← ∈I eval(𝜏𝑒 ) ∧ 𝑝 |= 𝐼 ⊲ computed by SMT solver𝐼 𝑆
+7: if Next ≠ ∅ then ⊲ some operations did not finish
+8: Ω𝑏 ← Ω𝑏 ∪ {(𝜏𝑒 ++ [𝑠],Next ∪ getNext(𝑠, 𝑝𝑐) \ {𝑠}, 𝑝𝑐 ∧ 𝑐) | 𝑐 ∈ getCond(𝑠), 𝑠 ∈ Next}
+9: else
+∧
+10: 𝑓valid ← 𝑓valid ∧ ( ∈I eval(𝜏𝑒 ) ∧ 𝑝 |= 𝐼 ) ⊲ computed by SMT solver𝐼 𝐶
+11: if ¬𝑓valid then ⊲ trace 𝜏𝑒 can violate invariants
+12: 𝑆𝑏 ← (C, 𝜏𝑒 ) ∪ 𝑆𝑏 , s.t. C is minimal and 𝜏𝑒 ̸ |=𝑐𝑜𝑛𝑠 C
+13: (C𝑏,Ω𝑏) ← Merge(𝑆𝑏, C𝑏,Ω𝑏) ⊲ merge constraints and examine pruned traces
+14: if C𝑏 = ⊤ return
+′ ′
+𝑏 < 𝑏 ? {(𝑏 → C𝑏−1)} : ⊤ ⊲ no solution for bounds
+′
+𝑏 > 𝑏
+15: else
+16: 𝑏 ← 𝑏 + 1, C𝑏 ← C𝑏−1, Ω𝑏 ← {([], Init,I𝐶 ∧ I𝑆 ) | Init ∈ Comb(𝑂, 𝑁,𝑏)}
+17: return ′ ′𝑏 < 𝑘 ? {(𝑏 → C𝑘 )} : ⊤ ⊲ solution of order 𝑘
+The algorithm initializes a worklist Ω1 for exploring single operations invoked in isolation.
+Comb(𝑂, 𝑁,𝑏) returns the set of initial steps for all different execution scenarios in the bound 𝑏,
+covering all combinations of methods in 𝑂 , dispatched to different nodes in the system. In our
+example, for 𝑏 = 2, Init will contain starting actions for two deposit calls dispatched to separate
+nodes, as well as to the same node. Infer then creates new worklist items for each combination
+of starting actions. Each new worklist item has an empty trace and a path condition that reflects
+starting from a safe and congruent state. All worklists are processed in the order of increasing𝑏 until
+the max bound 𝑘 is explored. If the worklist Ω𝑏 is nonempty, Infer chooses an item to process with
+Choose (line 4). While Choose can make arbitrary choices, Peepco implements particular optimized
+strategies; see § 5. If any of the constraints from the previous bound C𝑏−1 makes the trace infeasible,
+Infer prunes it (line 5). Next, Infer symbolically checks that the states reachable by executing
+𝜏𝑒 , under the current path condition 𝑝 , are safe, for all safety invariants (line 6). eval produces
+a symbolic formula from a trace, encoding the semantics of a sequential execution of its actions.
+Then, Infer checks if the trace is completed. If there are pending actions to execute, Next, for each
+such action 𝑠 , Infer produces a new item (lines 8). A new item is created where 𝑠 is added as the last
+action in the trace, updated path condition in case 𝑠 was a conditional, and newly enabled actions.
+getNext (𝑠 , 𝑝𝑐) returns the actions that are enabled after executing 𝑠 , under the path condition
+𝑝𝑐 . If 𝑠 has conditionals, for every branch of 𝑠 , Infer adds the condition 𝑐 (returned by getCond)
+that enables that branch to the new path condition. In our example, getNext(withdraw, true)
+produces two conditions, amt ≤ bal, amt > bal. The path of the other branch produces a no-op
+action. If there are no more actions to execute (line 10), i.e., the trace 𝜏𝑒 finished all its actions, Infer
+symbolically checks if congruence is restored. This check implies the specific point congruence is
+checked (at the batch end, per batch-based consistency; § 3.2). If 𝜏𝑒 violates safety or congruence,
+Infer infers the weakest C that prevents 𝜏𝑒 , by traversing and checking the consistency lattice.
+C is then added to 𝑆𝑏 along with 𝜏𝑒 , tracking all violating traces and consistency constraints that
+prevent them, as pairs. Infer then unifies constraints in 𝑆𝑏 with Merge to produce the weakest
+Proc. ACM Program. Lang., Vol. 9, No. OOPSLA1, Article 119. Publication date: April 2025.
+Peepco: Batch-Based Consistency Optimization 119:15
+solution for the violating traces in 𝑆𝑏 , as described subsequently. Infer then updates the solution C𝑏
+by computing join, ⊔ (line 13). Joining two lattice elements ensures we get the weakest consistency
+constraints that prevent traces prevented by both elements (as defined in § 3.3). If C𝑏 = ⊤, Infer
+returns without a solution, as the given integrity is unsatisfiable.
+If Ω𝑏 is empty (line 3) Infer proceeds to the next bound and populates the worklist Ω𝑏 with new
+items using Comb. It also propagates already discovered constraints 𝐶𝑏−1, to prevent all violating
+traces from prior bounds. After all worklists up to bound 𝐵 have been explored (line 17), Infer
+returns C𝑘 as the 𝑘-solution.
+Merging constraints. Intuitively, Merge unifies all discovered constraints (in 𝑆𝑏 ) by joining
+them (⊔). However, for optimality and to support for partial replication (§ 4.1),Merge must also
+handle constraints inferred from traces that get prevented by other constraints. Specifically,Merge:
+1) removes constraints C′ that might have been included in a prior bound but are not needed in
+the final solution; 2) reschedules all traces pruned by C′. Before computing the least upper bound,
+Merge examines constraints C and the traces 𝜏𝑒 they were inferred from. These are stored as pairs
+(C, 𝜏𝑒 ) in 𝑆𝑏 (line 12). If there exists a constraint (C
+′ ′
+, 𝜏 ) ∈ 𝑆𝑏 , where the trace
+′
+𝜏 that produced
+𝑒 𝑒
+it, is not feasible under some other constraint in 𝑆𝑏 , i.e.,
+′
+𝜏 ̸ |=𝑐𝑜𝑛𝑠 C, C
+′ is considered for removal.
+Only if the opposite does not hold, i.e., 𝜏𝑒 is feasible under C
+′, C′ gets removed. Merge then returns
+a new solution C𝑏 which is the least upper bound of the remaining constraints. Importantly, for
+any C′ that is filtered out, all the traces that were pruned based on C′ (line 5) in the current 𝑏 or
+any bound before 𝑏, are re-explored in Ω𝑏 (as they might still contain undiscovered, but needed,
+constraints).
+The pruning strategy achieved by Merge allows supporting non-inductive invariants (regardless
+of the monotonicity of I), as constraints discovered in a bound 𝑏 might restrict traces within
+smaller bounds ′𝑏 < 𝑏. This goes beyond approaches that rely on inductiveness [36], but does not
+pose an issue for “enumerate-and-check” approaches [37].
+Correctness. For well-formed and monotonic invariants, Infer is: sound—if it returns a solution,
+it admits only traces that satisfy integrity; complete—if a solution exists, Infer will return it;
+optimal—the returned solution is the weakest.
+Proof. Soundness holds due to the fact that all traces are either checked or pruned, based on
+the least upper bound of the weakest elements that prevent all found violating traces. In case a
+constraint is filtered out with Merge, all the pruned traces will be re-scheduled for exploration.
+As the algorithm checks all traces, for well-formed invariants at least strong consistency will
+be returned. Optimality relies on the fact that the algorithm correctly identifies the weakest set
+of constraints that prevent individual traces (line 12), merges them with ⊔, and prunes traces
+that would be infeasible under those constraints. Due to monotonicity, the orderings that caused
+consistency violations cannot be made viable by adding new operations, thus the solution for larger
+bounds cannot be made weaker. We present the full proof in the extended version of the paper. □
+Note that for a non-monotonic program, Infer is sound but not necessarily optimal. We discuss
+monotonicity and provide a simple example of non-monotonicity in Appendix C.
+4 Extensions
+In this section, we extend our approach for partial replication to allow data to be distributed across
+nodes [11], as well as a non-blocking protocol for fault tolerance.
+4.1 Partial Replication
+We consider how developers can leverage partial replication to allocate data to specific nodes,
+and leverage additional consistency optimization opportunities. We characterize semantics and
+implementation details of partial replication in Appendix A.
+Proc. ACM Program. Lang., Vol. 9, No. OOPSLA1, Article 119. Publication date: April 2025.
+119:16 Ivan Kuraj, John Feser, Nadia Polikarpova, and Armando Solar-Lezama
+var max = 100; var last = None replicate(bal, N )
+Bank replicas, Nr hist+=(“w”, 80) action: w Bank storage, {n
+r
+h}
+h
+distribute({last, max}, N )
+bal-=80 c
+def withdraw(amt: Nat) { Node n allocate(hist, n )1 effect: w’b Node n2 Node nh h
+if (amt ≤ max && amt ≤ bal) { bal → 20 bal → 100 hist → [(d,100)]
+last=Some(80) safe ∀n ∈ N. def i1. . .
+bal -= amt; hist += ("w", -amt) wl congr ∀na, nb ∈ N. def i2. . .
+last = Some(amt) }}
+NNooddee n nc
+def set(x: Int) { c set (50)
+max → safe ∀n ∈ Nc. def i3 =
+max = bal x / 100; wb max →
+ 1 10000
+* lalsats t→ → N Noonnee ws withdraw last[n].isEmpty ||
+last = None } Bank clients, Nc (80) last[n].get ≤ max[n]
+Fig. 7. Bank account Fig. 8. Distribution Fig. 9. Specification
+Specifications.We introduce an extended banking application that restricts the amount that can
+be withdrawn and tracks the last withdrawal (Fig. 7). We modify withdraw to check if the amount
+is within the limit max and add a method set that updates max as a percentage of bal. Fig. 8 shows
+a possible data allocation and is achieved with the specification shown in Fig. 9. We declare three
+node sets, 𝑁𝑟 (replicas), 𝑁𝑐 (clients), and 𝑁ℎ (storage), and specify the data distribution. bal is
+replicated on 𝑁𝑟 . Each client node in 𝑁𝑐 gets its copy of last and max. (Clients, e.g., ATMs, show
+the last transaction, similarly to a realistic bank interface, which shows the last few transactions
+after the user logs in.) The distribute keyword copies the given variable across the given node set.
+hist is allocated to the single node of 𝑁ℎ .
+4 allocate, behaves similarly to distribute, but restricts
+allocation to a single node, so 𝑁ℎ must be a singleton set. We adapt our existing integrity properties
+for the new data allocation and add a safety property (i3): the last withdrawal should not be
+greater than max on all clients 𝑁𝑐 . (We later describe executions that violate i3.)
+Distributed execution. The key change to distributed execution is that methods access fields
+that are only stored on certain nodes, so Peepco splits them (based on operation semantics and data
+allocation) into actions that execute on the node where the needed data is located. These actions
+have control-flow dependencies on other actions belonging to the same method. For example,
+withdraw is split into actions that have control flow dependencies as shown in Fig. 10, where
+𝑛 : 𝑎 shows action 𝑎 executed on 5𝑛 . Actions represent indivisible units of computation and reflect
+the sequential semantics of the method they belong to. While programmers write operations as
+atomic pieces of code that access data spread across different nodes, Peepco automatically handles
+operation splitting that dictates distributed execution, as well as, potentially, consistency choices
+at run-time. We define the semantics of execution under partial replication, as well as effects on
+consistency optimization, in Appendix A.
+For example, consider method calls withdraw(80) and set(50), and their execution, shown
+in Fig. 8. Invocations of ′ ′withdraw comprise five actions: 𝑤𝑠 ,𝑤𝑏,𝑤 ,𝑤𝑙 and 𝑤ℎ , where 𝑤 is an
+𝑏 𝑏
+effect of𝑤𝑏 . (We give full translated code for each action in Appendix A.1.) Actions are similar to
+operations in full replication: they update the local state and produce dependencies needed for
+the execution of the following actions. However, they execute only a part of the whole operation.
+When withdraw(80) is invoked, the starting action𝑤𝑠 is dispatched to any client (𝑁𝑐 ) and checks
+if amt ≤ max. That check passes and𝑤𝑏 is sent to the replica 𝑛1 or 𝑛2. Then,𝑤𝑏 checks amt ≤ bal,
+updates bal, propagates the effect ′𝑤 (bal-=80) to 𝑛2, sends 𝑤ℎ to the history node 𝑛ℎ , and 𝑤𝑙
+𝑏
+back to the 𝑁𝑐 node that started withdraw.𝑤ℎ updates the history, and𝑤𝑙 sets last=Some(80)
+on the client. set(50) executes two actions. The first is dispatched to 𝑛2 and reads its copy of bal
+and the second is dispatched to 𝑛𝑐 , where it updates max and resets last.
+4Storing big data structures like transaction histories on every replica is seldom useful or practical [72].
+5This is akin to, but more general than, the effects and the relations for transactions in [37, 68].
+Proc. ACM Program. Lang., Vol. 9, No. OOPSLA1, Article 119. Publication date: April 2025.
+Peepco: Batch-Based Consistency Optimization 119:17
+𝑤𝑠 : amt<=max 𝑤𝑙
+𝑛𝑐 𝑤ℎ (70) 𝑤ℎ (50)
+𝑛ℎ
+𝑁𝑐𝑛𝑠
+𝑤 {fin}𝑏
+𝑛1
+{pr} 𝑛1
+{fin} ✔: bal-=50
+𝑛2
+′
+𝑤
+𝑏
+𝑤 𝑛2ℎ
+𝑛ℎ ✔: bal-=70
+Fig. 10. Actions Fig. 11. Constraints Fig. 12. Execution Fig. 13. Redundant conflict
+Protocol. In full replication, any conflicting method can be dispatched to any node; in partial
+replication, some nodes never get a conflicting action. Peepco takes advantage of that fact to
+minimize consensus invocations. Peepco statically infers (a concrete set of nodes 𝑁 ) two disjoint
+sets of nodes for a given program: consensus nodes 𝑁𝑐𝑛𝑠 and non-consensus nodes 𝑁𝑐𝑛𝑠 (where
+𝑁𝑐𝑛𝑠 = 𝑁 \ 𝑁𝑐𝑛𝑠 ). The 𝑁𝑐𝑛𝑠 nodes must include any node on which a conflicting action executes.
+Non-consensus nodes do not participate in consensus and only listen for decisions from consensus
+nodes. In our example, only withdraw has a conflicting action:𝑤𝑏 , which executes on 𝑁𝑟 = {𝑛1, 𝑛2}.
+This labeling and derived constraints, where the ones bolded force the 𝑁𝑐𝑛𝑠 label, is shown in Fig. 11
+(considering set and deposit, where abbreviated method names designate the only method action
+on that node). As other methods are also dispatched on 𝑁𝑟 (and their first actions modify state), we
+let 𝑁𝑐𝑛𝑠 = 𝑁𝑟 (shown with a dotted line in Fig. 12).
+We depict an execution of the extended protocol in Fig. 12, where solid dots represent action
+execution and empty dots represent protocol events. Nodes in 𝑁𝑐𝑛𝑠 exchange votes as before
+(message {pr}). They agree on batches and notify 𝑁𝑐𝑛𝑠 , when: 1) a method is accepted into a batch
+and propagates next actions (dashed, unlabeled, lines in Fig. 12; line𝑄5 of Alg. 1), and 2) the batch is
+finalized, with a new message {fin} (dashed lines). Here,𝑤𝑏 invokes the consensus. After accepting
+𝑤𝑏 into the batch, 𝑛1 informs 𝑛ℎ and 𝑛𝑐 that their actions can be executed.
+Non-consensus nodes can progress if they know which batch they are in and actions carry the
+batch number of their methods. When a non-consensus node receives an action belonging to the
+batch the node is in, it executes the action in the order prescribed by the oracle. If the batch numbers
+do not match, the node waits to process the action until it catches up. 𝑁𝑐𝑛𝑠 nodes obtain information
+about methods that are accepted in the batch, as well when the batch is closed from 𝑁𝑐𝑛𝑠 , so they
+can safely determine which batch they are in. In our example, 𝑛ℎ receives the control message {fin}
+after executing𝑤ℎ . After executing an action, the node checks if it executed all actions of methods
+in the current batch and can proceed to the next batch (similarly as in line 𝐹2 of Alg. 1). As {fin}
+confirmed that withdraw is the only accepted method, 𝑛ℎ proceeds to the next batch.
+Peepco executes read-only actions that precede conflicting actions without invoking consensus.
+Here,𝑤𝑠 is read-only: it performs the check and spawns𝑤𝑏 , which invokes consensus.𝑤𝑠 , however,
+constrains the order of set calls, as shown below.
+In general, methods may have: 1) multiple conflicting actions and 2) actions preceding conflicting
+ones that modify the state. Actions in either of the groups cannot avoid consensus. To handle the
+general case, Peepco infers sets of actions, per method, that need to go through consensus (akin
+to transaction chains [14, 87]) and sets 𝑁𝑐𝑛𝑠 accordingly. We present the extended protocol in the
+extended version of the paper.
+Inference. Inferring consistency constraints for actions is largely the same as for methods. In our
+example, the effects of withdraw and deposit actions on replicas 𝑁𝑟 have the same consistency
+requirements as before, in the granularity of actions. For example, strong(𝑤 ,𝑤 ) designates
+𝑏 𝑏
+Proc. ACM Program. Lang., Vol. 9, No. OOPSLA1, Article 119. Publication date: April 2025.
+119:18 Ivan Kuraj, John Feser, Nadia Polikarpova, and Armando Solar-Lezama
+that the order of𝑤𝑏 from two different calls, has to be the same as the order of any actions that
+preceded𝑤𝑏 in program order.
+Unlike methods, however, actions have control flow dependencies which can affect their consis-
+tency requirements. For example, reordering𝑤ℎ from two concurrent𝑤𝑏 actions on 𝑛ℎ causes a
+violation (red dot in Fig. 13). Infer discovers this trace 𝜏𝑟 when exploring traces. However,𝑤𝑏 re-
+quires strong consistency (that might be discovered in some other trace), so there will never be two
+concurrent𝑤𝑏s and 𝜏𝑟 is impossible. There is no need for additional consistency requirements on
+𝑤ℎ to prevent 𝜏𝑟 . Infer, due to filtering inMerge (that removes constraints inferred from infeasible
+traces), removes the constraints pertaining to this redundant conflict.
+Constraints. Consider our example, where set(50)
+is invoked concurrently with that started delay(𝑎withdraw(80) 1, 𝑎2 ) :
+′
+on . The first action of withdraw, , reads the initial t(𝑎1 ) < t(𝑎2 ) ⇒ ∀𝑎2 ∈ pred(𝑎2 ) .𝑛𝑐 𝑤𝑠
+′
+value of max (100) and invokes 𝑤 on 𝑛 (Fig. 8). Con- nd(𝑎2 ) = nd(𝑎2 ) ⇒ t(
+′
+𝑎
+1 1
+) < t(𝑎
+𝑏 2
+)
+currently, set reads bal on 𝑛2 and updates max on 𝑛𝑐 . ′
+𝑎
+Afterwards, withdraw replies to 𝑛𝑐 to execute 2
+𝑎2
+𝑤𝑙 . How- 𝑛1
+ever, set completed, setting max to bal*x/100 based 𝑎1
+on a version of bal that did not witness the effect of
+withdraw. last thus holds Some(80) a value greater
+𝑛2
+than max: 50, violating i3 (akin to a “write skew” anom-
+aly [12]). While strong consistency would prevent this Fig. 14. Delay constraint
+violation, it would require unnecessary coordination be-
+tween 𝑁𝑐 and 𝑁𝑟 .
+We extend Peepco with a new weaker type of consistency constraint, 𝑑𝑒𝑙𝑎𝑦, shown in Fig. 14.
+The figure shows a logical interpretation of 𝑑𝑒𝑙𝑎𝑦 and the relationships of the involved actions that
+need to be satisfied in a trace it entails, where 𝑡 , 𝑝𝑟𝑒𝑑 , and 𝑛𝑑 designate the time of action execution,
+predecessors of the action (in the program order), and node on which action executes, respectively.
+The depicted trace 𝜏 does not satisfy 𝑑𝑒𝑙𝑎𝑦, i.e., 𝜏 ̸ |=𝑐𝑜𝑛𝑠 𝑑𝑒𝑙𝑎𝑦 (𝑎1, 𝑎2). A constraint 𝑑𝑒𝑙𝑎𝑦 (𝑎1, 𝑎2)
+effectively prevents executing 𝑎1 on 𝑛 if any predecessor of 𝑎2 already executed on 𝑛. (𝑑𝑒𝑙𝑎𝑦 is
+weaker than 𝑠𝑡𝑟𝑜𝑛𝑔, but incomparable to 𝑐𝑎𝑢𝑠𝑎𝑙 ; we will characterize the extended consistency
+lattice in the extended version of the paper.) Here, the constraint forces a delay on set, locally on
+𝑛𝑐 , until all𝑤𝑙 s of pending withdraws finish or are aborted (locking the node locally). This allows
+Peepco to batch the two together.
+Correctness.We show that these changes achieve B(I)-consistency and preserve the correctness
+properties of Infer and PeepCommit in the extended version of the paper.
+4.2 Non-blocking Protocol
+In this section, we present the non-blocking version of PeepCommit, FTPeepCommit. If a quorum
+(majority) of nodes is correct, every method call will eventually get a response while
+B(I)-consistency is maintained.
+Key idea. The crux of FTPeepCommit remains the same as 𝑛1
+in PeepCommit, where voting is used to determine if a new
+operation can be added to the current batch. We add another [vote] [commit]
+phase that happens after voting, in which FTPeepCommit at- 𝑛2
+tempts to collect confirmations about the decision to add a new [pre-commit]{pr}
+operation (borrowing the idea from quorum-based commit 𝑛3
+[69]). Once FTPeepCommit receives enough confirmations,
+it then proceeds to disseminate the decision. The additional Fig. 15. FTPeepCommit
+phase allows the protocol to tolerate failures even of the node
+Proc. ACM Program. Lang., Vol. 9, No. OOPSLA1, Article 119. Publication date: April 2025.
+Peepco: Batch-Based Consistency Optimization 119:19
+that initiated the voting: in case of at most 𝑓 failures, where 𝑁 = 2𝑓 + 1, at least one node that
+knows about the outcome, i.e., final decision, will remain non-faulty (responsive).
+Protocol.Wedescribe the protocol extensions, needed to achieve a new phase, called “pre-commit”
+(dotted lines), as shown in Fig. 15. Phases “vote” and “commit” are the same as in PeepCommit (in
+case of a successful call). Requests (lines 𝐶1−2 in Alg. 1), proposals (𝑃1−7), and voting, up to the
+decision part (𝑄1−4) are re-used in FTPeepCommit. Instead of initiating execution on “all-yes” (𝑄5−6),
+the initiating node 𝑛 in FTPeepCommit broadcasts a “pre-commit” message to all participants, for
+the given operation. On receiving the message, participants confirm the witnessing of the decision
+to add the operation to the batch. (If 𝑛 is believed to be faulty, e.g., after a timeout, participants will
+deny the pre-commit attempts from 𝑛, causing the abort behavior.) When 𝑛 collects confirmations
+from at least a quorum of all nodes (|𝑁 |/2 + 1), 𝑛 initiates the execution (as in𝑄5−6), and the rest of
+the actions mimic those in PeepCommit (𝑅1–𝑆3).
+While we described a successful, no-fault scenario, FTPeepCommit still aborts if any of the
+processes vote “no” in either “vote” or “pre-commit” phases (these messages are shown with dashed
+lines in Fig. 15). In case of faults, the protocol enters a “recovery phase” to elect a new transactor,
+which Peepco adopts from [69]. We provide the full protocol in the extended version of the paper.
+5 Implementation
+Peepco is implemented in approximately 29k lines of Scala (22k for static analysis and 7k for
+the runtime). We use Leon’s [42] Scala frontend (which includes lexing and parsing) and Leon’s
+verification conditions for data structures with recursive predicates.We use Z3 [21] to discharge SMT
+queries. Peepco’s networking stack is implemented using Akka [1] (on top of TCP-based channels).
+The input to Peepco is a Scala source file containing a set of functions and data constructors, along
+with the integrity and data distribution specifications.
+Inference.We implement Infer (Alg. 2) as a parallel worklist procedure and incorporate addi-
+tional strategies for pruning into Choose:
+• Effect-driven pruning examines variable reads and writes to prune traces that cannot change the
+invariants [28].
+• Symmetry breaking avoids reordering identical effects from calls of the same method [24].
+In addition, our exploration engine includes several optimizations aimed at rewriting and simplifying
+symbolic values before invoking the external solver. We provide additional details in Appendix E.
+Protocol. PeepCommit can exhibit starvation when there are repeated aborts. To remedy this
+Peepco employs a strategy for breaking ties during voting that favors calls with many retries, as
+well as with fewer conflicts according to CanBatchI .
+Safe and congruent reads. Peepco, by default, executes node-local reads as safe, and multi-node
+reads as congruent. Peepco implements congruent reads by executing them at the end of the current
+batch, collecting the state from all the needed nodes.
+6 Evaluation
+In this section, we evaluate our implementation and illustrate the performance benefits of consis-
+tency optimization in batch-based consistency. We also evaluate Peepco’s sensitivity to different
+workloads and the impacts of the explored bound at run-time.
+Inference benchmarks.We consider the following CRDTs and replicated applications introduced
+in prior work: LWWRegister [65]: a last-write-wins register, where reads return the value of the latest
+write; NNCounter [36]: a non-negative counter with increment and decrement; Bank account [68]:
+our motivating example; Courseware [30]: a database model for course enrollments; Microblog [37]:
+Proc. ACM Program. Lang., Vol. 9, No. OOPSLA1, Article 119. Publication date: April 2025.
+119:20 Ivan Kuraj, John Feser, Nadia Polikarpova, and Armando Solar-Lezama
+a Twitter-like messaging application; Auction [30]: an auction with bidding and closing; and
+Payroll [4]: an employee database.
+We also consider a new use case: DivGSet(x), a modification of the grow-only set from [65] that
+can only be optimized by bounding the number of operations at run time. It supports insertions
+and limits the divergence of the set copies across replicas. A safety property bounds the difference
+in the set size between replicas by 𝑥 . Peepco maintains safety by only allowing up to 𝑥 concurrent
+add operations.
+Some of our use cases are
+Table 1. Inference statistics after 15 minutes. Legend: |𝑂 | - number of
+methods; int. - number of integrity properties (safe/congruent); |C| - relational—theymodel databases
+number of found constraints; 𝐵𝑜 , 𝐵𝑐 , 𝐵𝑒 , 𝐵𝑠 - maximal explored bound, with integrity constraints. We
+default, without consistency, effect, and symmetry pruning, respec- fully replicate relational use
+tively. cases. We specify the integrity
+properties that are studied in
+data max. bound prior work, including unique-
+distribution benchmark |𝑂 | int. |C| 𝐵𝑜 𝐵𝑐 𝐵𝑒 𝐵𝑠 ness, referential integrity (one-
+full rep. LWWRegister 2 1/1 1 7 6 6 4 to-many and many-to-many re-
+full rep. NNCounter 2 1/1 1 7 3 5 7 lations between two tables),
+full rep. Bank(w) 2 1/1 1 8 8 5 8 and the integrity of table rows
+full rep. Bank(w,d) 3 2/2 2 7 3 2 3 [36, 37]. For example, Course-
+full rep. Bank(w,d,i) 4 2/2 4 7 4 3 4
+ware is a database modeling a
+full rep. Courseware 6 3/1 3 5 4 3 4
+full rep. Microblog 2 1/1 1 5 3 4 3 school, which stores informa-
+full rep. Auction 3 1/1 2 6 4 5 5 tion about students and courses,
+full rep. Payroll 7 3/1 2 3 3 3 3 and tracks students registering
+full rep. DivGSet(3) 2 1/1 1 8 5 8 5 and enrolling in courses. It re-
+distributed Bank(w) 3 2/1 0 8 8 7 8 quires referential integrity be-
+distributed Bank(w,d) 4 2/1 1 7 6 4 5 tween the course and student ta-
+distributed Bank(w,d,i) 5 2/1 3 5 3 5 5
+bles and allows adding and re-
+distributed TPC-E 1 2/1 1 5 4 3 4
+moving courses. Payroll stores
+partial rep. Bank(w) 3 1/2 1 8 8 4 8
+partial rep. Bank(w,d) 4 2/2 3 7 5 2 4 employee and department re-
+partial rep. Bank(w,d,i) 5 2/2 7 6 4 2 4 lations, where employees and
+partial rep. Bank(w,d,s) 5 3/2 4 8 5 2 4 departments can be added and
+removed and their salaries up-
+dated. In addition to referential integrity between the tables, salaries have a row-integrity constraint.
+We include the transactional use case TPC-E, which is an elaborate database benchmark that
+emulates a brokerage [76], which we model similarly to [37]. (This use case is relational, but unlike
+prior relational use cases, it is partially replicated for this experiment.) We model “Trade-Result”,
+a transaction that emulates completing a stock market trade, but represent the tables—Trade,
+Holding, Broker, and Holding_Summary—as fields, and distribute them across separate nodes
+(using allocation specifications presented in § 4.1). We assert aggregate equality on trades and
+commissions, as well as holding quantity across tables [76].
+We include partial replication use cases as variants of the partial bank account from § 4.1. We
+use the specified data distribution and vary the methods of the object. In this benchmark, when
+set is included, Peepco discovers and prevents the write skew anomaly between methods.
+Inference platform. Our experiments were performed on a machine with an Intel Xeon E5-2699
+v2 with 24 2.2GHz cores and 48GB of RAM. We used OpenJDK 18.0.1 with one JVM thread per core.
+Inference results.We measured the maximal bounds Peepco explores, stopping after 15 minutes
+or exploring bound 8, and show the results in Table 1. For each benchmark, we report the data
+allocation scheme, the number of considered methods, and the number of safety and congruence
+Proc. ACM Program. Lang., Vol. 9, No. OOPSLA1, Article 119. Publication date: April 2025.
+Peepco: Batch-Based Consistency Optimization 119:21
+invariants. For Bank, we evaluate multiple sets of methods; Bank(O) includes only the methods
+𝑂 . We use shorthand w,d,i,s to stand for withdraw, deposit, interest, and set, respectively.
+Each benchmark includes one safe read method that reads the state from any node in case of full
+replication and an additional congruent read in case of distribution and partial replication. For each
+benchmark, we report inference results: the number of constraints comprising the final solution
+and the maximal bound explored.
+We give results for Infer (𝐵𝑜 ) and three ablations, in which
+we turn off an optimization individually: 𝐵𝑐 , which disables
+pruning based on found consistency constraints; 𝐵𝑒 , which dis-
+ables effect-driven pruning; and 𝐵𝑠 , which disables symmetry
+breaking (described in § 5). The results, shown in the right-
+most columns of Table 1, indicate that while consistency-based
+pruning is the most effective in general, symmetry breaking
+has a significant impact when methods do not exhibit many
+violations. Effect-based pruning has visible impacts in the case
+of distribution and partial replication, as the number of exe-
+cution steps that don’t affect the checked property grows. To
+Fig. 16. No-conflict scalability
+investigate limits of bounded exploration, we ran Peepco on
+Bank(w,d,i,s), in partial replication, for 12 hours, and found that the maximum explored bound
+explored was 10.
+We evaluate how inference scales with the number of steps to explore in Infer. We generated
+variants of the NNCounter benchmark, to contain multiple identical increment methods, where exp
+n designates 𝑛 identical methods. We measured time to infer a particular bound, with a timeout of
+480 seconds. We report results in Fig. 16. We then extended the variants exp n to partial replication
+by including data distributed across different nodes and not including it in any integrity properties.
+We added two additional actions to each of the counter increment methods. The times to reach
+the same bounds in partial replication variants were within 10% of exp n (not shown). The results
+suggest that while Peepco suffers from exponential blowup, additional actions and longer method
+traces, do not pose scalability issues and run time performance penalties in the partial replication
+case of Peepco’s protocol. Moreover, scalability issues are likely caused by the inability to prune
+operations that do not exhibit violations and would be otherwise safe to add to batches.
+Run-time platform. For our run-time performance evaluation, we deploy the distributed
+applications produced by Peepco on a commodity OpenStack cluster. Each cluster node has an
+Intel Xeon E5-2630 with 8 cores at 2.20GHz, 8GB of RAM, and runs OpenJDK 1.8.0. The inter-node
+latency is 0.5ms on average and we introduce a uniform delay of 40-60ms on each link at the
+network layer (simulating a geo-distributed setting [68]). Our client workloads model the YCSB
+benchmark in the high contention case for “hot records,” where very few entries are accessed most
+of the time [20]. The benchmark chooses an object from an array of size 1000, using a Zipfian
+distribution with 𝜃 = 0.5 (modeling the medium case of contention for "hot records" [20]) in all
+cases except Courseware, which uses 𝜃 = 0.01 (modeling uniformity of active courses). We spawn
+between 8 and 64 client threads on 15 nodes. (Each client is invoking operations, i.e., sending
+requests, serially, to the system.) Each experiment runs for 180 seconds with 10 seconds of warmup.
+Run-time results.We compared the throughput of Peepco with two baselines: strong consis-
+tency and a static consistency optimization approach for weak consistency we modeled (Classify).
+The strongly consistent baseline is implemented using two-phase commit (2PC) to ensure total order
+between operations [31]. Classify infers the optimal consistency level for a method but does not use
+dynamic information (akin to [36]). It uses the same reliable and causal broadcast abstractions as
+Peepco to implement weak and causal consistency and falls back to using 2PC for operations that
+Proc. ACM Program. Lang., Vol. 9, No. OOPSLA1, Article 119. Publication date: April 2025.
+119:22 Ivan Kuraj, John Feser, Nadia Polikarpova, and Armando Solar-Lezama
+(a) Bank(w,d,i), uniform (b) Bank(w,d), uniform (c) Bank(w,d,i), skewed
+(d) Courseware, uniform (e) Courseware, uniform (f) Bank(w,d,s), uniform, partial
+Fig. 17. Run-time performance in full replication. For (a)–(c) and (e)–(f), higher is better. For (d), lower is
+better.
+require strong consistency. Peepco uses the inference results after 15 minutes of search (reported in
+Table 1). We measured throughput (Fig. 17) on the Bank use case, fully replicated on 8 cluster nodes.
+Throughput is measured as operations completed per second. We performed three experiments. In
+the first experiment, Bank(w,d,i), uniform (Fig. 17a), clients choose one of the four methods (three
+write methods, and a safe read) uniformly. Peepco achieves significantly more throughput than
+Classify—over 2.2× for 64 clients on each node. Peepco allows non-conflicting method calls at run
+time to proceed concurrently, which are assigned strong consistency by Classify and need to invoke
+2PC in the worst case. Going through a round-trip communication to ensure total order in the worst
+case is expensive, and fast reads do not alleviate the issue. We also run the same experiment, on
+Bank(w,d), uniform (Fig. 17b). (This is equivalent to the motivating example examined in [36, 68].)
+Classify outperforms Peepco and demonstrates better scalability, as deposits are executed without
+requiring an agreement phase and potential rollback due to conflicts in other operations in the
+batch, as well as its size. In our third experiment, Bank(w,d,i), skewed (Fig. 17c), we only require
+congruence, and clients invoke interest only 5% of the time (and withdraw and deposit 35%).
+Peepco’s speedup increases to 2.6× because the only method that requires total order (interest) is
+present infrequently causing fewer aborts when the other two methods are invoked.
+We examined response times on Courseware, deployed in the same way. We measure the time
+between issuing the method call and receiving a response of success and report the average, across
+all requests made (Fig. 17d). The 6 bars in the figure designate the number of clients per node.
+Peepco’s response time is significantly lower than that of the strong consistency baseline. The
+read-only method query has the lowest response time because it does not require a round-trip.
+The other methods have significantly higher response times, with delCourse dominating because
+it conflicts with addCourse and enrol, each of which has only one pairwise conflict. We also
+measure throughput for Courseware (Fig. 17e) and find that it is higher than for Bank (∼1.5×
+speedup improvement, for 960 clients), due to the lower number of conflicts, relative to the executed
+operations in the uniform workload.
+Proc. ACM Program. Lang., Vol. 9, No. OOPSLA1, Article 119. Publication date: April 2025.
+Peepco: Batch-Based Consistency Optimization 119:23
+To demonstrate the benefits of partial replication, we measured throughput (Fig. 17f) of the
+partially replicated Bank(w,d,s) use case, and compared Peepco to SC-analysis, an approach that
+models the analysis used in transaction chopping [67], as well as fully replicated PeepCommit,
+peepco(f). SC-analysis runs optimized methods with weak consistency, but otherwise defaults to
+strong consistency (similar to Classify). We spawned 5 nodes as replicas of the balance and 9 nodes
+as the client nodes (𝑁𝑟 and 𝑁𝑐 , respectively, as specified in § 4.1). Peepco partially synchronizes
+actions on 𝑁𝑟 which leads to fewer aborts and achieves better throughput (up to 30%) than full-
+replication PeepCommit, particularly as the number of clients grows. Peepco achieves a speed-up
+of 2.5× over SC-analysis as it avoids coordination only for queries.
+To measure Peepco’s sensi-
+tivity to contention, we varied
+the 𝜃 parameter of the Zipfian
+distribution [20], using 0.01, 0.5,
+and 0.9 to emulate low,medium,
+and high contention, last being
+the highest severity. Peepco’s
+batches fill faster when con-
+tention is higher, reducing per-
+formance (Fig. 18a). We exam- (a) Bank(w,d), uniform (b) LWW reg., write-only
+ined the effect of the batch size
+𝑏 on the cumulative throughput Fig. 18. Sensitivity to contention and batch size
+on the write-only, LWW regis-
+ter benchmark, which uses only writes (Fig. 18b). We report the speedup relative to Peepco with
+b=7, for multiple batch sizes and varying numbers of clients. Peepco with b=7 achieves significant
+speedups relative to smaller batches. Larger batches provide speedups as the number of clients
+grows, up to 1.5x, due to more concurrent methods being able to saturate larger batches. We
+compared b=1 (no consistency optimization) to the strong consistency baseline, showing a small
+overhead (throughput within 5%).
+We evaluate the extent of Peepco’s optimizations in the non-blocking version of the protocol,
+FTPeepCommit. We compare Peepco’s performance to a non-optimized baseline that leverages the
+“three-phase-commit” [69], as well as the non-blocking protocol from Hamsaz [36], on the Bank
+use-case. The experiments choose to execute the query with
+10% probability, and any of withdraw, deposit, and interest
+with 90%. The results in Fig. 19 show Peepco-ft and classify-ft,
+which designate Peepco running FTPeepCommit and Classify,
+described previously. While the speedups remain comparable
+to that of the blocking variants, incurring 2.1x to 1.7x for
+120 and 480 clients compared to not optimizing with Peepco,
+respectively, the absolute throughput drops down to 48%. This
+shows the additional time spent in the “pre-commit” phase, in
+which batches are kept locked, negatively affects performance
+making other operations abort. To compare to Hamsaz, we
+Fig. 19. Non-blocking protocols
+replicated the configuration described in [36], and used 4 nodes
+with 1 thread per node. We used 𝜃 = 0.99 to force targetting a single (“hot”) record, as Hamsaz
+implements a single object. The average throughput was 12,7 and 4,6 in the case of Peepco
+and Hamsaz, respectively, suggesting the performance gains of batch-based consistency, of 2.7x,
+outweigh the advantages of leader-based consensus approaches (used by Hamsaz).
+Proc. ACM Program. Lang., Vol. 9, No. OOPSLA1, Article 119. Publication date: April 2025.
+119:24 Ivan Kuraj, John Feser, Nadia Polikarpova, and Armando Solar-Lezama
+7 Related Work
+Static analysis for consistency optimization. The idea of using static analysis to optimize
+consistency was motivated by a line of work. Quelea [68] introduced static analysis for consistency
+optimization, using high-level contracts. Q9 [37] added application-specific invariants and pro-
+posed the use of bounded symbolic reasoning. Hamsaz [36] extended the idea with the synthesis of
+replicated objects, and Hampa [52] added reasoning about recency. ECROs [22] avoid coordination
+further by local reordering. Atropos [63] introduced consistency optimization by exploring adjust-
+ments in the program’s data layout. Peepco combines static reasoning with runtime information to
+realize new optimization opportunities, while allowing specializing consistency model through
+integrity, and, in turn controlling and exposing state after convergence, periodically. Peepco’s
+protocol, however, is blocking and requires agreement even for non-conflicting operations. In
+addition to replicated objects, Peepco extends the expressiveness to support partial replication.
+Run-time techniques. Sieve [49, 50] defines a consistency model called RedBlue which executes
+operations with two modes of consistency. Olisipo [51], refines the approach and presents two
+coordination protocols, where one can be used for infrequent operations. Peepco supports static
+analysis in the extended consistency lattice, including weak consistency, automatically checks
+that integrity holds, and uses dynamic information to allow concurrent execution of operations.
+Warranties [53] and “treaties” in Homestasis [64], presented the idea of using run-time checks for the
+node-local state that allows avoiding coordination. By contrast, Peepco’s run time checks optimize
+operations even when a treaty might be violated, as they are informed by using global dynamic
+information, collected from other nodes in the system, through the new protocol. Moreover, Peepco
+additionally supports protocols such as causality and delays, as well as congruence properties.
+Elaborate specifications. Some approaches let developers aid the consistency optimization
+by providing, tags and conflicts between tags CISE [30, 60], counterexample fixes for inductive
+generalizations [61], and conflict avoidance annotations in Indigo [8, 10], conflict resolutions in
+IPA [9] and consistency guards in Carol [48]. By contrast, Peepco provides automation while only
+requiring the specification of high-level invariants. While Peepco cannot provide the guarantees
+of unbounded full verification ([47, 59, 79]), empirical evidence suggests it provides performance
+benefits by leveraging results from a relatively expressive SMT-based bounded-reasoning procedure,
+while preserving application-specific integrity at run time.
+Type systems. Disciplined inconsistency [35] presents a type system that disallows the flow of
+weakly consistent values into strongly consistent operations unless allowed by the programmer.
+MixT [57] introduced transactional support with types that allow accessing different stores with
+varying consistency guarantees and used information flow analysis to limit the influence of weakly
+consistent data on transaction control flow. Some programming models allow mixing consistency
+levels to some extent [23, 35, 43, 80]. Peepco splits methods into pieces under data partitioning,
+but it does not require consistency annotations to be associated with objects and locations, and it
+infers the consistency of each piece automatically. Peepco, moreover, assigns consistency levels to
+particular operation splits, rather than fixing a particular object or memory location with a specific
+model. It considers control-flow dependent splits, as well as other operations that might occur at
+run-time, but it does not handle loops.
+Replicated objects. Replicated objects and data types have been proposed [16, 65, 66, 83, 84],
+studied in terms of invariant preservation [3, 4, 54], and used in systems [7, 86]. MRDTs [40]
+have shown that such objects allow deriving merge functions that can alleviate conflicts and
+provide safety. Quark [39] then introduced convergence with run-time assistance, and Peepul [70]
+verifies their efficient implementations. Katara [45] used lightweight ordering constraints. The
+space of consistency models has been characterized in terms of a partially-ordered lattice [73, 78].
+Proc. ACM Program. Lang., Vol. 9, No. OOPSLA1, Article 119. Publication date: April 2025.
+Peepco: Batch-Based Consistency Optimization 119:25
+PRACTI [11] motivated the partial replication model and defined flexible consistency as one of its
+key components. Peepco follows the approach of encoding different consistency levels as a lattice.
+Peepco, however, also supports partial replication by extending reasoning about the system to
+many different nodes and includes the flexibility of programmer-specialized consistency models, in
+addition to being “tunable” based on the operation semantics [78].
+Databases and transactional systems. Prior work has studied correctness conditions for find-
+ing the lowest isolation level for transactions [27, 55]. Alone-Together [38] formulated a program
+logic for automated verification of weakly-isolated transactions. In addition, transaction decompo-
+sition was used to aid such reasoning, with transaction chopping [18, 67], step-decomposition [13],
+transaction chains [87], locality-aware [19] and security-aware decomposition [85]. Other work
+incorporates run-time heuristics into chopping approaches, to extract concurrency [58, 81, 87].
+Similarly, Peepco splits methods, treating them as transactions. However, Peepco employs a new
+bounded exploration procedure that it uses to achieve automated run-time classification and avoid
+the pitfalls of limited information analysis of traditional chopping.
+Some approaches for transaction management, such as Calvin [75], Coco [56] and other deter-
+ministic databases [25, 26] amortize the cost of the coordination protocols by running transactions
+deterministically across multiple nodes and introduce epochs in which multiple transactions can
+batch together. While some of these systems need to know a transaction’s read/write set, to prevent
+conflicting accesses, or rely on optimistic checks that might abort transactions, one distinguishing
+feature of Peepco is that it analyzes the semantic properties of operations (and invariants) so that it
+can dynamically start different operations concurrently (e.g. an operation is accepted into the batch
+while other are currently running). While these systems usually leverage some a priori known
+criteria for fixing the operations in the batch, such as a common cutoff time (e.g. 10 ms), Peepco
+does this dynamically and might decide to close the batch early or late, depending on the given
+workload.
+Context-dependent consistency. There is significant prior work on reducing coordination with
+context-dependent techniques: by allowing (bounded) staleness in replicas [6, 82], by providing
+applications with a choice between fast inconsistent results and slower consistent results [32], or by
+dynamically tuning consistency in response to load [44, 74]. In contrast to these approaches, Peepco
+does not reduce coordination but attempts to increase concurrency through batching, according to
+the dynamic context. Peepco, however, provides fast local reads, as well as congruent snapshots
+that do not slow the system down, regardless of conflicts in the update methods.
+8 Conclusion
+Our approach explores a new point in the consistency optimization design space, by combining static
+analysis results with dynamic communicated information obtained at run time. It allows optimizing
+applications that do not admit weak consistency, nor eventuality, where the coordination cost is
+likely inevitable. Our strategy allows a specialized consistency model based on the application’s
+needs and provides access to congruent snapshots that do not delay other operations. Our approach
+supports both replication and distribution, providing a higher degree of optimization when static
+analysis runs longer. We implemented our approach in Peepco, which includes a front-end DSL,
+a code synthesizer, and a JVM-based run-time. Our evaluation shows the approach can bring
+significant performance benefits over the state-of-the-art, especially in cases where operations
+might conflict only with relatively few other operations or their parts.
+Acknowledgments
+This work was supported by the National Science Foundation, grant No. 2217064 and 1918839, and
+Grammatech Inc., grant No. FA875020C0208.
+Proc. ACM Program. Lang., Vol. 9, No. OOPSLA1, Article 119. Publication date: April 2025.
+119:26 Ivan Kuraj, John Feser, Nadia Polikarpova, and Armando Solar-Lezama
+References
+[1] 2023. Akka – actor toolkit and runtime, http://akka.io/. http://akka.io/
+[2] Daniel Abadi. 2012. Consistency tradeoffs in modern distributed database system design: CAP is only part of the story.
+Computer 45, 2 (2012), 37–42. doi:10.1109/mc.2012.33
+[3] Peter Alvaro, Neil Conway, Joseph M Hellerstein, and David Maier. 2017. Blazes: Coordination Analysis and Placement
+for Distributed Programs. ACM Transactions on Database Systems (TODS) 42, 4 (2017), 1–31.
+[4] Peter Bailis, Alan Fekete, Michael J Franklin, Ali Ghodsi, Joseph M Hellerstein, and Ion Stoica. 2014. Coordination
+avoidance in database systems (Extended version). arXiv preprint arXiv:1402.2237 (2014). doi:10.48550/arxiv.1402.2237
+[5] Peter Bailis, Ali Ghodsi, Joseph M. Hellerstein, and Ion Stoica. 2013. Bolt-on causal consistency. In Proceedings of
+the 2013 ACM SIGMOD International Conference on Management of Data (New York, New York, USA) (SIGMOD ’13).
+Association for Computing Machinery, New York, NY, USA, 761–772. doi:10.1145/2463676.2465279
+[6] Peter Bailis, Shivaram Venkataraman, Michael J. Franklin, Joseph M. Hellerstein, and Ion Stoica. 2012. Probabilistically
+Bounded Staleness for Practical Partial Quorums. Proc. VLDB Endow. 5, 8 (2012), 776–787. doi:10.14778/2212351.2212359
+[7] Mahesh Balakrishnan, Dahlia Malkhi, Ted Wobber, Ming Wu, Vijayan Prabhakaran, Michael Wei, John D Davis, Sriram
+Rao, Tao Zou, and Aviad Zuck. 2013. Tango: Distributed data structures over a shared log. In Proceedings of the
+twenty-fourth ACM symposium on operating systems principles. 325–340.
+[8] Valter Balegas, Sérgio Duarte, Carla Ferreira, Rodrigo Rodrigues, Nuno Preguiça, Mahsa Najafzadeh, and Marc Shapiro.
+2015. Towards fast invariant preservation in geo-replicated systems. ACM SIGOPS Operating Systems Review 49, 1
+(2015), 121–125.
+[9] Valter Balegas, Sérgio Duarte, Carla Ferreira, Rodrigo Rodrigues, and Nuno Preguiça. 2018. IPA: Invariant-Preserving
+Applications for Weakly Consistent Replicated Databases. Proc. VLDB Endow. 12, 4 (dec 2018), 404–418. doi:10.14778/
+3297753.3297760
+[10] Valter Balegas, Sérgio Duarte, Carla Ferreira, Rodrigo Rodrigues, Nuno Preguiça, Mahsa Najafzadeh, and Marc Shapiro.
+2015. Putting Consistency Back into Eventual Consistency. In Proceedings of the Tenth European Conference on Computer
+Systems (Bordeaux, France) (EuroSys ’15). Association for ComputingMachinery, New York, NY, USA, Article 6, 16 pages.
+doi:10.1145/2741948.2741972
+[11] Nalini Moti Belaramani, Michael Dahlin, Lei Gao, Amol Nayate, Arun Venkataramani, Praveen Yalagandula, and
+Jiandan Zheng. 2006. PRACTI Replication.. In NSDI, Vol. 6. 5–5.
+[12] Hal Berenson, Phil Bernstein, Jim Gray, Jim Melton, Elizabeth O’Neil, and Patrick O’Neil. 1995. A critique of ANSI SQL
+isolation levels. ACM SIGMOD Record 24, 2 (1995), 1–10.
+[13] Arthur J Bernstein, David S Gerstl, and Philip M Lewis. 1999. Concurrency control for step-decomposed transactions.
+Information Systems 24, 8 (1999), 673–698. doi:10.1016/s0306-4379(00)00004-1
+[14] Yuri Breitbart, Hector Garcia-Molina, and Avi Silberschatz. 2010. Overview of multidatabase transaction management.
+In CASCON First Decade High Impact Papers. 93–126.
+[15] Eric Brewer. 2012. CAP twelve years later: How the "rules" have changed. Computer 45, 2 (2012), 23–29. doi:10.1109/
+mc.2012.37
+[16] Sebastian Burckhardt, AlexeyGotsman, Hongseok Yang, andMarek Zawirski. 2014. ReplicatedData Types: Specification,
+Verification, Optimality. In Proceedings of the 41st ACM SIGPLAN-SIGACT Symposium on Principles of Programming
+Languages (San Diego, California, USA) (POPL ’14). Association for Computing Machinery, New York, NY, USA,
+271–284. doi:10.1145/2535838.2535848
+[17] Christian Cachin, Rachid Guerraoui, and Luís Rodrigues. 2011. Introduction to reliable and secure distributed program-
+ming. Springer Science & Business Media. doi:10.1007/978-3-642-15260-3
+[18] Andrea Cerone, Alexey Gotsman, and Hongseok Yang. 2015. Transaction chopping for parallel snapshot isolation. In
+International Symposium on Distributed Computing. Springer, 388–404. doi:10.1007/978-3-662-48653-5_26
+[19] Alvin Cheung, Owen Arden, Samuel Madden, and Andrew C Myers. 2012. Automatic Partitioning of Database
+Applications. Proceedings of the VLDB Endowment 5, 11 (2012).
+[20] Brian F. Cooper, Adam Silberstein, Erwin Tam, Raghu Ramakrishnan, and Russell Sears. 2010. Benchmarking Cloud
+Serving Systems with YCSB. In Proceedings of the 1st ACM Symposium on Cloud Computing (Indianapolis, Indiana,
+USA) (SoCC ’10). Association for Computing Machinery, New York, NY, USA, 143–154. doi:10.1145/1807128.1807152
+[21] Leonardo De Moura and Nikolaj Bjørner. 2008. Z3: An efficient SMT solver. In Tools and Algorithms for the Construction
+and Analysis of Systems: 14th International Conference, TACAS 2008, Held as Part of the Joint European Conferences
+on Theory and Practice of Software, ETAPS 2008, Budapest, Hungary, March 29-April 6, 2008. Proceedings 14. Springer,
+337–340. doi:10.1007/978-3-540-78800-3_24
+[22] Kevin De Porre, Carla Ferreira, Nuno Preguiça, and Elisa Gonzalez Boix. 2021. ECROs: Building Global Scale Systems
+from Sequential Code. Proc. ACM Program. Lang. 5, OOPSLA, Article 107 (oct 2021), 30 pages. doi:10.1145/3485484
+[23] Kevin De Porre, FlorianMyter, Christophe Scholliers, and Elisa Gonzalez Boix. 2020. CScript: A distributed programming
+language for building mixed-consistency applications. J. Parallel and Distrib. Comput. 144 (2020), 109–123. doi:10.1016/
+Proc. ACM Program. Lang., Vol. 9, No. OOPSLA1, Article 119. Publication date: April 2025.
+Peepco: Batch-Based Consistency Optimization 119:27
+j.jpdc.2020.05.010
+[24] E Allen Emerson and A Prasad Sistla. 1996. Symmetry and model checking. Formal methods in system design 9, 1-2
+(1996), 105–131. doi:10.1007/bf00625970
+[25] Jose M Faleiro and Daniel J Abadi. 2014. Rethinking serializable multiversion concurrency control. arXiv preprint
+arXiv:1412.2324 (2014).
+[26] Jose M Faleiro, Daniel J Abadi, and Joseph M Hellerstein. 2017. High performance transactions via early write visibility.
+Proceedings of the VLDB Endowment 10, 5 (2017).
+[27] Alan Fekete, Dimitrios Liarokapis, Elizabeth O’Neil, Patrick O’Neil, and Dennis Shasha. 2005. Making snapshot
+isolation serializable. ACM Transactions on Database Systems (TODS) 30, 2 (2005), 492–528.
+[28] Cormac Flanagan and Patrice Godefroid. 2005. Dynamic Partial-Order Reduction for Model Checking Software. In
+Proceedings of the 32nd ACM SIGPLAN-SIGACT Symposium on Principles of Programming Languages (Long Beach,
+California, USA) (POPL ’05). Association for Computing Machinery, New York, NY, USA, 110–121. doi:10.1145/1040305.
+1040315
+[29] Seth Gilbert and Nancy Lynch. 2002. Brewer’s Conjecture and the Feasibility of Consistent, Available, Partition-Tolerant
+Web Services. SIGACT News 33, 2 (jun 2002), 51–59. doi:10.1145/564585.564601
+[30] Alexey Gotsman, Hongseok Yang, Carla Ferreira, Mahsa Najafzadeh, Marc Shapiro, Alexey Gotsman, Hongseok Yang,
+Carla Ferreira, Mahsa Najafzadeh, and Marc Shapiro. 2016. ’Cause i’m strong enough: reasoning about consistency
+choices in distributed systems. In POPL.
+[31] Jim Gray and Leslie Lamport. 2006. Consensus on transaction commit. ACM Transactions on Database Systems (TODS)
+31, 1 (2006), 133–160.
+[32] Rachid Guerraoui, Matej Pavlovic, and Dragos-Adrian Seredinschi. 2016. Incremental Consistency Guarantees
+for Replicated Objects. In 12th USENIX Symposium on Operating Systems Design and Implementation, OSDI 2016,
+Savannah, GA, USA, November 2-4, 2016, Kimberly Keeton and Timothy Roscoe (Eds.). USENIX Association, 169–184.
+https://www.usenix.org/conference/osdi16/technical-sessions/presentation/guerraoui
+[33] Rachael Harding, Dana Van Aken, Andrew Pavlo, and Michael Stonebraker. 2017. An evaluation of distributed
+concurrency control. Proceedings of the VLDB Endowment 10, 5 (2017), 553–564.
+[34] Maurice P. Herlihy and Jeannette M. Wing. 1990. Linearizability: a correctness condition for concurrent objects. ACM
+Transactions on Programming Languages and Systems (1990).
+[35] Brandon Holt, James Bornholt, Irene Zhang, Dan Ports, Mark Oskin, and Luis Ceze. 2016. Disciplined inconsistency
+with consistency types. In Proceedings of the Seventh ACM Symposium on Cloud Computing. 279–293.
+[36] Farzin Houshmand and Mohsen Lesani. 2019. Hamsaz: replication coordination analysis and synthesis. PACMPL 3,
+POPL (2019), 74:1–74:32. doi:10.1145/3290387
+[37] Gowtham Kaki, Kapil Earanky, KC Sivaramakrishnan, and Suresh Jagannathan. 2018. Safe Replication through
+Bounded Concurrency Verification. Proc. ACM Program. Lang. 2, OOPSLA, Article 164 (October 2018), 27 pages.
+doi:10.1145/3276534
+[38] Gowtham Kaki, Kartik Nagar, Mahsa Najafzadeh, and Suresh Jagannathan. 2018. Alone together: compositional
+reasoning and inference for weak isolation. Proc. ACM Program. Lang. 2, POPL (2018), 27:1–27:34. doi:10.1145/3158115
+[39] Gowtham Kaki, Prasanth Prahladan, and Nicholas V Lewchenko. 2022. RunTime-assisted convergence in replicated
+data types. In Proceedings of the 43rd ACM SIGPLAN International Conference on Programming Language Design and
+Implementation. 364–378.
+[40] Gowtham Kaki, Swarn Priya, KC Sivaramakrishnan, and Suresh Jagannathan. 2019. Mergeable Replicated Data Types.
+Proc. ACM Program. Lang. 3, OOPSLA, Article 154 (oct 2019), 29 pages. doi:10.1145/3360580
+[41] Martin Kleppmann, Adam Wiggins, Peter van Hardenberg, and Mark McGranaghan. 2019. Local-First Software: You
+Own Your Data, in Spite of the Cloud. In Proceedings of the 2019 ACM SIGPLAN International Symposium on New
+Ideas, New Paradigms, and Reflections on Programming and Software (Athens, Greece) (Onward! 2019). Association for
+Computing Machinery, New York, NY, USA, 154–178. doi:10.1145/3359591.3359737
+[42] Etienne Kneuss, Ivan Kuraj, Viktor Kuncak, and Philippe Suter. 2013. Synthesis modulo recursive functions. In
+OOPSLA.
+[43] Mirko Köhler, Nafise Eskandani, Pascal Weisenburger, Alessandro Margara, and Guido Salvaneschi. 2020. Rethinking
+safe consistency in distributed object-oriented programming. Proceedings of the ACM on Programming Languages 4,
+OOPSLA (2020), 1–30.
+[44] Tim Kraska, Martin Hentschel, Gustavo Alonso, and Donald Kossmann. 2009. Consistency Rationing in the Cloud: Pay
+only when it matters. Proc. VLDB Endow. 2, 1 (2009), 253–264. doi:10.14778/1687627.1687657
+[45] Shadaj Laddad, Conor Power, Mae Milano, Alvin Cheung, and Joseph M. Hellerstein. 2022. Katara: Synthesizing CRDTs
+with Verified Lifting. Proc. ACM Program. Lang. 6, OOPSLA2, Article 173 (oct 2022), 29 pages. doi:10.1145/3563336
+[46] Leslie Lamport. 1978. Time, Clocks, and the Ordering of Events in a Distributed System. Commun. ACM (1978).
+Proc. ACM Program. Lang., Vol. 9, No. OOPSLA1, Article 119. Publication date: April 2025.
+119:28 Ivan Kuraj, John Feser, Nadia Polikarpova, and Armando Solar-Lezama
+[47] Mohsen Lesani, Christian J Bell, and Adam Chlipala. 2016. Chapar: certified causally consistent distributed key-value
+stores. In ACM SIGPLAN Notices, Vol. 51. ACM, 357–370.
+[48] Nicholas V Lewchenko, Arjun Radhakrishna, Akash Gaonkar, and Pavol Černỳ. 2019. Sequential programming for
+replicated data stores. Proceedings of the ACM on Programming Languages 3, ICFP (2019), 1–28.
+[49] Cheng Li, João Leitão, Allen Clement, Nuno Preguiça, Rodrigo Rodrigues, and Viktor Vafeiadis. 2014. Automating the
+Choice of Consistency Levels in Replicated Systems. In Proceedings of the 2014 USENIX Conference on USENIX Annual
+Technical Conference (Philadelphia, PA) (USENIX ATC’14). USENIX Association, USA, 281–292.
+[50] Cheng Li, Daniel Charles Ferreira Porto, Allen Clement, Johannes Gehrke, Nuno M. Preguiça, and Rodrigo
+Seromenho Miragaia Rodrigues. 2012. Making Geo-Replicated Systems Fast as Possible, Consistent when Necessary.
+In USENIX Symposium on Operating Systems Design and Implementation.
+[51] Cheng Li, Nuno Preguiça, and Rodrigo Rodrigues. 2018. Fine-grained consistency for geo-replicated systems. In 2018
+USENIX Annual Technical Conference (USENIX ATC 18). 359–372.
+[52] Xiao Li, Farzin Houshmand, and Mohsen Lesani. 2020. Hampa: Solver-Aided Recency-Aware Replication. In Computer
+Aided Verification, Shuvendu K. Lahiri and Chao Wang (Eds.). Springer International Publishing, Cham, 324–349.
+doi:10.1007/978-3-030-53288-8_16
+[53] Jed Liu, Tom Magrino, Owen Arden, Michael D George, and Andrew C Myers. 2014. Warranties for faster strong
+consistency. In 11th USENIX Symposium on Networked Systems Design and Implementation (NSDI 14). 503–517.
+[54] Yiyun Liu, James Parker, Patrick Redmond, Lindsey Kuper, Michael Hicks, and Niki Vazou. 2020. Verifying replicated
+data types with typeclass refinements in Liquid Haskell. Proceedings of the ACM on Programming Languages 4, OOPSLA
+(2020), 1–30.
+[55] Shiyong Lu, Arthur Bernstein, and Philip Lewis. 2004. Correct execution of transactions at different isolation levels.
+IEEE Transactions on Knowledge and Data Engineering 16, 9 (2004), 1070–1081. doi:10.1109/tkde.2004.34
+[56] Yi Lu, Xiangyao Yu, Lei Cao, and Samuel Madden. 2021. Epoch-based commit and replication in distributed OLTP
+databases. (2021).
+[57] Mae Milano and Andrew C. Myers. 2018. MixT: a language for mixing consistency in geodistributed transactions. In
+Proceedings of the 39th ACM SIGPLAN Conference on Programming Language Design and Implementation (Philadelphia,
+PA, USA) (PLDI 2018). Association for Computing Machinery, New York, NY, USA, 226–241. doi:10.1145/3192366.
+3192375
+[58] Shuai Mu, Yang Cui, Yang Zhang, Wyatt Lloyd, and Jinyang Li. 2014. Extracting more concurrency from distributed
+transactions. In 11th USENIX Symposium on Operating Systems Design and Implementation (OSDI 14). 479–494.
+[59] Kartik Nagar and Suresh Jagannathan. 2019. Automated parameterized verification of CRDTs. In Computer Aided
+Verification: 31st International Conference, CAV 2019, New York City, NY, USA, July 15-18, 2019, Proceedings, Part II 31.
+Springer, 459–477. doi:10.1007/978-3-030-25543-5_26
+[60] Mahsa Najafzadeh, Alexey Gotsman, Hongseok Yang, Carla Ferreira, and Marc Shapiro. 2016. The CISE tool: proving
+weakly-consistent applications correct. In Proceedings of the 2nd Workshop on the Principles and Practice of Consistency
+for Distributed Data. 1–3.
+[61] Oded Padon, Jochen Hoenicke, Giuliano Losa, Andreas Podelski, Mooly Sagiv, and Sharon Shoham. 2017. Reducing
+liveness to safety in first-order logic. Proceedings of the ACM on Programming Languages 2, POPL (2017), 1–33.
+[62] Amir Pnueli. 1981. The temporal semantics of concurrent programs. Theoretical computer science 13, 1 (1981), 45–60.
+doi:10.1016/0304-3975(81)90110-9
+[63] Kia Rahmani, Kartik Nagar, Benjamin Delaware, and Suresh Jagannathan. 2021. Repairing serializability bugs in
+distributed database programs via automated schema refactoring. In Proceedings of the 42nd ACM SIGPLAN International
+Conference on Programming Language Design and Implementation. 32–47.
+[64] Sudip Roy, Lucja Kot, Gabriel Bender, Bailu Ding, Hossein Hojjat, Christoph Koch, Nate Foster, and Johannes Gehrke.
+2015. The homeostasis protocol: Avoiding transaction coordination through program analysis. In Proceedings of the
+2015 ACM SIGMOD International Conference on Management of Data. 1311–1326.
+[65] Marc Shapiro, Nuno Preguiça, Carlos Baquero, and Marek Zawirski. 2011. A comprehensive study of convergent and
+commutative replicated data types. (2011).
+[66] Marc Shapiro, Nuno Preguiça, Carlos Baquero, and Marek Zawirski. 2011. Conflict-Free Replicated Data Types. In
+Stabilization, Safety, and Security of Distributed Systems, Xavier Défago, Franck Petit, and Vincent Villain (Eds.). Springer
+Berlin Heidelberg, Berlin, Heidelberg, 386–400. doi:10.1007/978-3-642-24550-3_29
+[67] Dennis Shasha, Francois Llirbat, Eric Simon, and Patrick Valduriez. 1995. Transaction Chopping: Algorithms and
+Performance Studies. ACM Trans. Database Syst. 20, 3 (September 1995), 325–363. doi:10.1145/211414.211427
+[68] KC Sivaramakrishnan, Gowtham Kaki, and Suresh Jagannathan. 2015. Declarative Programming over Eventually
+Consistent Data Stores. In Proceedings of the 36th ACM SIGPLAN Conference on Programming Language Design and
+Implementation (Portland, OR, USA) (PLDI ’15). ACM, New York, NY, USA, 413–424. doi:10.1145/2737924.2737981
+[69] Dale Skeen. 1982. A quorum-based commit protocol. Technical Report. Cornell University.
+Proc. ACM Program. Lang., Vol. 9, No. OOPSLA1, Article 119. Publication date: April 2025.
+Peepco: Batch-Based Consistency Optimization 119:29
+[70] Vimala Soundarapandian, Adharsh Kamath, Kartik Nagar, and KC Sivaramakrishnan. 2022. Certified mergeable
+replicated data types. In Proceedings of the 43rd ACM SIGPLAN International Conference on Programming Language
+Design and Implementation. 332–347.
+[71] Yair Sovran, Russell Power, Marcos K. Aguilera, and Jinyang Li. 2011. Transactional Storage for Geo-Replicated
+Systems. In Proceedings of the Twenty-Third ACM Symposium on Operating Systems Principles (Cascais, Portugal) (SOSP
+’11). Association for Computing Machinery, New York, NY, USA, 385–400. doi:10.1145/2043556.2043592
+[72] Michael Stonebraker, Samuel Madden, Daniel J. Abadi, Stavros Harizopoulos, Nabil Hachem, and Pat Helland. 2007.
+The end of an Architectural Era: (It’s Time for a Complete Rewrite). In VLDB ’07: Proceedings of the 33rd international
+conference on Very large data bases (Vienna, Austria). VLDB Endowment, 1150–1160. http://hstore.cs.brown.edu/
+papers/hstore-endofera.pdf
+[73] Douglas B. Terry, Alan J. Demers, Karin Petersen, Mike Spreitzer, Marvin Theimer, and Brent W. Welch. 1994. Session
+Guarantees for Weakly Consistent Replicated Data. In Proceedings of the Third International Conference on Parallel and
+Distributed Information Systems (PDIS ’94). IEEE Computer Society, USA, 140–149. doi:10.1109/pdis.1994.331722
+[74] Douglas B. Terry, Vijayan Prabhakaran, Ramakrishna Kotla, Mahesh Balakrishnan, Marcos K. Aguilera, and Hussam
+Abu-Libdeh. 2013. Consistency-based service level agreements for cloud storage. In ACM SIGOPS 24th Symposium on
+Operating Systems Principles, SOSP ’13, Farmington, PA, USA, November 3-6, 2013, Michael Kaminsky and Mike Dahlin
+(Eds.). ACM, 309–324. doi:10.1145/2517349.2522731
+[75] Alexander Thomson, Thaddeus Diamond, Shu-Chun Weng, Kun Ren, Philip Shao, and Daniel J Abadi. 2012. Calvin:
+fast distributed transactions for partitioned database systems. In Proceedings of the 2012 ACM SIGMOD International
+Conference on Management of Data. 1–12.
+[76] Transaction Processing Performance Council TPC. 2010. Tpc benchmark™ E.
+[77] Nicolas Viennot, Mathias Lécuyer, Jonathan Bell, Roxana Geambasu, Jason Nieh, L Mathias, Jonathan Bell, Roxana
+Geambasu, and Jason Nieh. 2015. Synapse: AMicroservices Architecture for Heterogeneous-DatabaseWeb Applications.
+EuroSys (2015).
+[78] Paolo Viotti and Marko Vukolić. 2016. Consistency in Non-Transactional Distributed Storage Systems. ACM Comput.
+Surv. 49, 1, Article 19 (jun 2016), 34 pages. doi:10.1145/2926965
+[79] James R. Wilcox, Doug Woos, Pavel Panchekha, Zachary Tatlock, Xi Wang, Michael D. Ernst, and Thomas Anderson.
+2015. Verdi: A Framework for Implementing and Formally Verifying Distributed Systems. In Proceedings of the 36th
+ACM SIGPLAN Conference on Programming Language Design and Implementation (Portland, OR, USA) (PLDI ’15).
+Association for Computing Machinery, New York, NY, USA, 357–368. doi:10.1145/2737924.2737958
+[80] Chao Xie, Chunzhi Su, Manos Kapritsos, Yang Wang, Navid Yaghmazadeh, Lorenzo Alvisi, and Prince Mahajan. 2014.
+Salt: Combining {ACID} and {BASE} in a distributed database. In 11th USENIX Symposium on Operating Systems
+Design and Implementation (OSDI 14). 495–509.
+[81] Chao Xie, Chunzhi Su, Cody Littley, Lorenzo Alvisi, Manos Kapritsos, and Yang Wang. 2015. High-performance ACID
+via modular concurrency control. In Proceedings of the 25th Symposium on Operating Systems Principles. 279–294.
+[82] Haifeng Yu and Amin Vahdat. 2000. Design and Evaluation of a Continuous Consistency Model for Replicated
+Services. In 4th Symposium on Operating System Design and Implementation (OSDI 2000), San Diego, California,
+USA, October 23-25, 2000, Michael B. Jones and M. Frans Kaashoek (Eds.). USENIX Association, 305–318. http:
+//dl.acm.org/citation.cfm?id=1251250
+[83] George Zakhour, Pascal Weisenburger, and Guido Salvaneschi. 2023. Type-Checking CRDT Convergence. Proc. ACM
+Program. Lang. 7, PLDI, Article 162 (jun 2023), 24 pages. doi:10.1145/3591276
+[84] George Zakhour, Pascal Weisenburger, and Guido Salvaneschi. 2024. Automated Verification of Fundamental Algebraic
+Laws. Proceedings of the ACM on Programming Languages 8, PLDI (2024), 766–789.
+[85] Steve Zdancewic and Andrew C Myers. 2003. Observational determinism for concurrent program security. In 16th
+IEEE Computer Security Foundations Workshop, 2003. Proceedings. IEEE, 29–43. doi:10.1109/csfw.2003.1212703
+[86] Irene Zhang, Niel Lebeck, Pedro Fonseca, Brandon Holt, Raymond Cheng, Ariadna Norberg, Arvind Krishnamurthy,
+and Henry M. Levy. 2016. Diamond: Automating Data Management and Storage for Wide-Area, Reactive Applications.
+In 12th USENIX Symposium on Operating Systems Design and Implementation (OSDI 16). USENIX Association, Savannah,
+GA, 723–738. https://www.usenix.org/conference/osdi16/technical-sessions/presentation/zhang-irene
+[87] Yang Zhang, Russell Power, Siyuan Zhou, Yair Sovran, Marcos K Aguilera, and Jinyang Li. 2013. Transaction chains:
+achieving serializability with low latency in geo-distributed storage systems. In Proceedings of the Twenty-Fourth ACM
+Symposium on Operating Systems Principles. 276–291.
+Received 2024-10-16; accepted 2025-02-18
+Proc. ACM Program. Lang., Vol. 9, No. OOPSLA1, Article 119. Publication date: April 2025.

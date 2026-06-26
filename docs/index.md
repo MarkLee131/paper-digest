@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-06-26](reports/2026-06-26/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 2</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
+
+A *formal-foundations* day. Two Outstanding picks share a single methodological move: turn an empirical practice into a small, checkable property and let an existing engine do the heavy lifting. **OTF (On-the-Fly Compiler Feedback for Rust)** (Venev, Mündler, He, Song, Vechev — ETH SRI, ICML 2026 submission) introduces a lightweight *extractor* that…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-06-25](reports/2026-06-25/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
 
