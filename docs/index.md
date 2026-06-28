@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-06-28](reports/2026-06-28/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
+
+A *quiet-queue* day: the 24 h window delivered two `Recommended articles` candidates from the Scholar alert feed and no user-curated self-emails. Both candidates fall inside saturated subfields — deep-learning-based source-code vulnerability detection in a mid-tier Springer journal, and LLM-driven RTSP fuzzing seed generation in MDPI *Electronics* — and…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-06-26](reports/2026-06-26/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 2</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
 
