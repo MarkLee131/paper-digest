@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-06-29](reports/2026-06-29/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
+
+A **zero-alert** day: the 24 h Scholar-alert query returned no new threads, and the user-curated self-email queue was also empty. No candidates entered Stage-1, no deep-reads were performed, and the preference layer — which currently has only one attribute clearing the n ≥ 2 promotion/demotion threshold — was effectively idle for lack of input. The…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-06-28](reports/2026-06-28/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
 
