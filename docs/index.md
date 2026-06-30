@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-06-30](reports/2026-06-30/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 1</span><span class="chip keep">Keep 7</span><span class="chip borderline">Borderline 5</span></div>
+
+A *vulnerability-detection*-heavy day with one structural standout. **Revelio** (Hou, Wang, Lyu, Momeu, Nguyen, Yang, Sen, Song, Wagner — UC Berkeley + collaborators, arXiv:2606.22263) closes the gap LLM-based vuln-finders have struggled with for two years — hallucination at repository scale — by generating an executable Proof-of-Vulnerability that a…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-06-29](reports/2026-06-29/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
 
