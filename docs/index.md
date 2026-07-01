@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-07-01](reports/2026-07-01/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
+
+A **zero-alert** day: the 24 h Scholar-alert query returned no new threads, and the user-curated self-email queue was also empty. The most recent upstream Scholar batch (dated 2026-06-29, 13 threads including the Revelio Outstanding pick) was already deep-read on the previous run and falls outside today's window. No candidates entered Stage-1, no…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-06-30](reports/2026-06-30/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 1</span><span class="chip keep">Keep 7</span><span class="chip borderline">Borderline 5</span></div>
 
