@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-07-02](reports/2026-07-02/index.md)
+<div class="meta"></div>
+
+_(no executive summary detected)_
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-07-01](reports/2026-07-01/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
 
