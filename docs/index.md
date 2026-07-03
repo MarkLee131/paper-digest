@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-07-03](reports/2026-07-03/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 2</span><span class="chip borderline">Borderline 0</span></div>
+
+Three Scholar-alert threads returned in the 24 h window: one "Recommended articles" batch (three candidates, all Stage-1 Skipped as saturated DL-for-vuln-detection at off-axis venues) plus two followed-researcher alerts (Emina Torlak, Armando Solar-Lezama). The followed-researcher override auto-proceeded both to Stage-2, but on retrieval both turned out…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-07-02](reports/2026-07-02/index.md)
 <div class="meta"></div>
 
