@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-07-04](reports/2026-07-04/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 2</span><span class="chip keep">Keep 4</span><span class="chip borderline">Borderline 1</span></div>
+
+Three Scholar-alert threads returned in the 24 h window: a "Recommended articles" batch with seven candidates, plus followed-researcher alerts for Andreas Zeller (two papers) and David Lo (one). Ten total candidates, no exclusion-list hits, no user-curated self-emails. Stage-1 discarded three from the Recommended batch as saturated…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-07-03](reports/2026-07-03/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 2</span><span class="chip borderline">Borderline 0</span></div>
 
