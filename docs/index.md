@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-07-05](reports/2026-07-05/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
+
+Nothing to report today. The Gmail 24-hour window returned zero new `scholaralerts-noreply@google.com` threads and zero self-forwarded queue items. The three Scholar-alert threads that Gmail surfaces at the 2-day boundary (Recommended articles, Andreas Zeller, David Lo) all landed on 3 July 23:17 UTC and were already deep-read in yesterday's [2026-07-04…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-07-04](reports/2026-07-04/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 2</span><span class="chip keep">Keep 4</span><span class="chip borderline">Borderline 1</span></div>
 
