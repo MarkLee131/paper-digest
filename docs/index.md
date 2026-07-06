@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-07-06](reports/2026-07-06/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 2</span><span class="chip keep">Keep 8</span><span class="chip borderline">Borderline 5</span></div>
+
+The Monday burst returned eight Scholar-alert threads — seven followed-researcher alerts (Hakjoo Oh, Qingkai Shi, Xin Xia, Zhendong Su, Penghui Li, Ge Li, David Lo) and one "Recommended articles" batch with ten candidates. Zero self-forwarded queue items. Twenty-four raw candidates before dedup, twenty-one after dedup (VulInstruct surfaced by both the Ge…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-07-05](reports/2026-07-05/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
 
