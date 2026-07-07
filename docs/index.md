@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-07-07](reports/2026-07-07/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 2</span><span class="chip keep">Keep 4</span><span class="chip borderline">Borderline 1</span></div>
+
+Tuesday's inbox delivered eight Scholar-alert threads (Xin Xia, Thorsten Holz, David Lo, Qingkai Shi, Recommended articles, Zhenchang Xing, Xiao Cheng, and a duplicate co-author thread for Gelei Deng that dedups against the Zhenchang Xing HECATE thread). Ten followed-researcher candidates and seven from the Recommended batch — seventeen raw. The…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-07-06](reports/2026-07-06/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 2</span><span class="chip keep">Keep 8</span><span class="chip borderline">Borderline 5</span></div>
 
