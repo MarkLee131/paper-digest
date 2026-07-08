@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-07-08](reports/2026-07-08/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
+
+A zero-inflow day. No new `scholaralerts-noreply@google.com` threads landed inside the 24-hour window — the last batch arrived on 2026-07-06 and was fully triaged in yesterday's report. The self-forwarded reading queue was also empty for the same window. The feedback-driven preference layer was refreshed successfully and now covers 19 attribute…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-07-07](reports/2026-07-07/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 2</span><span class="chip keep">Keep 4</span><span class="chip borderline">Borderline 1</span></div>
 
