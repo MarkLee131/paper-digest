@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-07-09](reports/2026-07-09/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 1</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
+
+A quiet Scholar-alert day — for the second run in a row the `scholaralerts-noreply@google.com` inflow was empty inside the 24-hour window, and a wider two-day probe confirms the last batch remains the 2026-07-06 one that was fully triaged in the 2026-07-07 report. The self-forwarded reading queue produced exactly one item: an IEEE Xplore stampPDF URL…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-07-08](reports/2026-07-08/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
 
