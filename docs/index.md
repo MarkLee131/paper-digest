@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-07-10](reports/2026-07-10/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
+
+Third consecutive quiet day. Neither the `scholaralerts-noreply@google.com` feed nor the self-forwarded reading queue produced a thread inside the 24-hour window. A wider five-day probe returns seventeen Scholar-alert threads dated 2026-07-05, 2026-07-06, and 2026-07-08, which confirms the subscription is receiving alerts normally — mid-July 2026 simply…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-07-09](reports/2026-07-09/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 1</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
 
