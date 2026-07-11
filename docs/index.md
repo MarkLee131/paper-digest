@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-07-11](reports/2026-07-11/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 2</span><span class="chip keep">Keep 2</span><span class="chip borderline">Borderline 0</span></div>
+
+Two Scholar-alert threads landed in the window — one for Bihuan Chen (four candidates) and one for Yangruibo Ding (a single ICML position paper) — and the user-curated forward queue was empty. Four papers cleared Stage-1; one arXiv text-to-video training-orchestration paper was routed as a name collision (a different "B Chen" than the Fudan SE…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-07-10](reports/2026-07-10/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
 
