@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-07-12](reports/2026-07-12/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 2</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
+
+Four Scholar-alert threads landed in the window — one each for Xiao Cheng, Zhenchang Xing, and Gelei Deng, plus one Recommended-articles batch of six — for nine raw candidates total. The user-curated forward queue was empty. Two candidates cleared Stage-1: an arXiv preprint from the Xiao Cheng thread that proposes a neuro-symbolic vulnerability detector…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-07-11](reports/2026-07-11/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 2</span><span class="chip keep">Keep 2</span><span class="chip borderline">Borderline 0</span></div>
 
