@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-07-14](reports/2026-07-14/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 2</span><span class="chip keep">Keep 2</span><span class="chip borderline">Borderline 1</span></div>
+
+Four Scholar-alert threads landed in the window — one each from followed researchers Zhiqiang Lin, Cheng Wen, and Andreas Zeller, plus one Recommended-articles batch of three — for six raw candidates total. The user-curated forward queue was empty. Five candidates cleared Stage-1: two SSBSE 2026 short papers on search-based testing (the FANDANGO…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-07-12](reports/2026-07-12/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 2</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
 
