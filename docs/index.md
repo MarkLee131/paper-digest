@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-07-15](reports/2026-07-15/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 1</span><span class="chip keep">Keep 2</span><span class="chip borderline">Borderline 1</span></div>
+
+Two Scholar-alert threads landed in the window — one followed-researcher alert (Zhenchang Xing, arXiv preprint) and one Recommended-articles batch of seven candidates. The user-curated forward queue was empty. Four candidates cleared Stage-1: an agent-trajectory watermarking preprint that formalises a *two-channel* construction robust to both deletion…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-07-14](reports/2026-07-14/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 2</span><span class="chip keep">Keep 2</span><span class="chip borderline">Borderline 1</span></div>
 
