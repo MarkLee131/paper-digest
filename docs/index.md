@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-07-16](reports/2026-07-16/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
+
+Empty window. No new Scholar-alert threads landed between the 2026-07-15 pipeline run and this morning, and the user-curated forward queue was also empty. The two Scholar-alert threads dated 2026-07-14 22:50 UTC were already ingested and reported yesterday. The preference layer stays quiet — the only attribute with n ≥ 2 historical observations is…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-07-15](reports/2026-07-15/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 1</span><span class="chip keep">Keep 2</span><span class="chip borderline">Borderline 1</span></div>
 
