@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-07-17](reports/2026-07-17/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 2</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
+
+Two Scholar-alert threads landed in the window — one followed-researcher alert for Zhiqiang Lin (PETS 2026) and one Recommended-articles thread carrying a Mathy Vanhoef / KU Leuven paper (ESORICS 2026). The user-curated forward queue (STEP 2b) was empty. Both candidates cleared Stage-1 and both merited full deep-reads: the Ellis & Lin paper formalises…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-07-16](reports/2026-07-16/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
 
