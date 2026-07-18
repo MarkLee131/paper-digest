@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-07-18](reports/2026-07-18/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
+
+A *quiet-inbox* day. Zero new Google Scholar alert threads and zero user-curated self-emails landed inside the 24 h window. The two most recent Scholar threads (Ellis & Lin's PoPETs 2026 anonymity-leakage study and Robben & Vanhoef's ESORICS 2026 WireGuard security-testing paper) both carried 2026-07-16 16:16 UTC timestamps and were already fully…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-07-17](reports/2026-07-17/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 2</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
 
