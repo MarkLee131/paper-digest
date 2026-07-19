@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-07-19](reports/2026-07-19/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 2</span><span class="chip keep">Keep 3</span><span class="chip borderline">Borderline 0</span></div>
+
+A cohort of four deep-read papers plus one policy-brief summary. The theme of the day is **iterative LLM-agent pipelines replacing one-shot prompting** across three otherwise unrelated software-engineering tasks: directed fuzzing seed synthesis (SeedSmith), Python type-annotation *updating* (TypeUp, ICSE 2026), and binary-to-source recovery via anchor…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-07-18](reports/2026-07-18/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
 
