@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-07-20](reports/2026-07-20/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 2</span><span class="chip keep">Keep 3</span><span class="chip borderline">Borderline 0</span></div>
+
+A small but sharp cohort of two deep-read preprints plus three shorter venue-published summaries. Today's theme is **decoupling reasoning from execution in LLM-driven program work**: DREA separates a heavyweight security-reasoning *Planner* from a lightweight repository-*Explorer* to cut billable API tokens by 16–48× while lifting Pair-Correctness on…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-07-19](reports/2026-07-19/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 2</span><span class="chip keep">Keep 3</span><span class="chip borderline">Borderline 0</span></div>
 
