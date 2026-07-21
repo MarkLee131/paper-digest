@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-07-21](reports/2026-07-21/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 1</span><span class="chip keep">Keep 2</span><span class="chip borderline">Borderline 0</span></div>
+
+A slim triage day dominated by one deep-readable venue paper: the PoPETs 2026 head-to-head between *syntactic matching* and *dynamic taint tracking* for stateful web-tracking detection (Calzavara, Casarin, Squarcina, Maffei — Ca' Foscari + IMT Lucca + TU Wien). Working from a shared corpus of 40,605 tracking requests over the Tranco Top-10K, the authors…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-07-20](reports/2026-07-20/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 2</span><span class="chip keep">Keep 3</span><span class="chip borderline">Borderline 0</span></div>
 
