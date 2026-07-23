@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-07-23](reports/2026-07-23/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 1</span><span class="chip keep">Keep 2</span><span class="chip borderline">Borderline 1</span></div>
+
+Today's most substantive item is **DevGen** — an ACL 2026 System Demonstrations paper (San Diego, CC-BY-4.0) from the Xidian ICTT / Cheng Wen team that builds an LLM-driven pipeline for synthesising QEMU virtual-device models directly from Linux driver source. The design triple is static analysis over the driver source, step-by-step LLM prompting, and an…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-07-21](reports/2026-07-21/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 1</span><span class="chip keep">Keep 2</span><span class="chip borderline">Borderline 0</span></div>
 
