@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-07-26](reports/2026-07-26/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
+
+No new candidates arrived in today's 24-hour window. Both intake channels — Google Scholar alerts and the user-curated self-email queue — returned zero threads at run time. This is a quiet-day report: no papers were screened at Stage-1 and none were deep-read. The next scheduled run will pick up whatever accumulates in the next 24 hours; carry-over from…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-07-23](reports/2026-07-23/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 1</span><span class="chip keep">Keep 2</span><span class="chip borderline">Borderline 1</span></div>
 
