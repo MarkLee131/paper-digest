@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-07-27](reports/2026-07-27/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 1</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
+
+The Google Scholar alert channel was empty for the second consecutive day; the entire yield this window came from the user-curated self-email queue, which contributed one paper — and it is a strong one.
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-07-26](reports/2026-07-26/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
 
