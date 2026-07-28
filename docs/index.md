@@ -10,10 +10,17 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-07-28](reports/2026-07-28/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 1</span><span class="chip keep">Keep 2</span><span class="chip borderline">Borderline 0</span></div>
+
+The Google Scholar channel woke up after two silent days and delivered four candidates across two alert threads; three survived screening. The self-curated queue contributed nothing new — both emails it returned were the same two papers already covered in yesterday's digest, still inside Gmail's rolling 24-hour window, and were dropped at intake.
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-07-27](reports/2026-07-27/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 2</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
 
-The Google Scholar alert channel was empty for the second consecutive day; the entire yield this window came from the user-curated self-email queue, which contributed one paper — and it is a strong one.
+The Google Scholar alert channel was empty for the second consecutive day; the entire yield this window came from the user-curated self-email queue, which contributed two papers — and both are strong. They arrived four minutes apart from unrelated fields, and read unexpectedly well together (see Cross-Paper Synthesis).
 </div>
 
 <div class="digest-card" markdown>
