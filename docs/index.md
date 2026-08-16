@@ -10,6 +10,27 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-08-16](reports/2026-08-16/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 1</span><span class="chip borderline">Borderline 1</span></div>
+
+A thin window. Three alert threads, three distinct candidates, no self-curated papers. After yesterday's fifteen-candidate flood this is a return to the intake channel's normal behaviour, and it makes today a good day to read one paper properly rather than nine partially.
+</div>
+
+<div class="digest-card" markdown>
+### [2026-08-15](reports/2026-08-15/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 2</span><span class="chip keep">Keep 5</span><span class="chip borderline">Borderline 2</span></div>
+
+After eleven days in which the intake channel produced almost nothing, today's window delivered fifteen candidates across four alert threads — the largest single-day intake this digest has seen since the spring. Nine cleared Stage-1 screening. The user-curated self-email queue was silent, so everything below arrived through Scholar.
+</div>
+
+<div class="digest-card" markdown>
+### [2026-08-14](reports/2026-08-14/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
+
+One paper carries forward from today's window, and the more consequential result is that the window was not empty at all.
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-08-03](reports/2026-08-03/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
 
