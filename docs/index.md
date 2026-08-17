@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-08-17](reports/2026-08-17/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 1</span><span class="chip keep">Keep 1</span><span class="chip borderline">Borderline 2</span></div>
+
+Four alert threads, twelve distinct candidates — the widest window in a fortnight, and for once the width is real rather than an artefact of one noisy recommendation thread. Three followed researchers each fired, and the profile-recommendation thread carried eight items, six of them fuzzing.
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-08-16](reports/2026-08-16/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 1</span><span class="chip borderline">Borderline 1</span></div>
 
