@@ -10,6 +10,20 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-08-19](reports/2026-08-19/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
+
+No new papers arrived in today's window, and the more interesting fact is *how nearly this report failed to notice*.
+</div>
+
+<div class="digest-card" markdown>
+### [2026-08-18](reports/2026-08-18/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 2</span><span class="chip keep">Keep 1</span><span class="chip borderline">Borderline 1</span></div>
+
+One alert thread, six candidates, three deep-reads — and for the first time in four days the fetch layer cooperated, so all three are full-text reads with the papers' own numbers rather than abstract-level pointers. Three papers arrived independently, from three different subfields, and made structurally the same argument: **the expensive stage of your…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-08-17](reports/2026-08-17/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 1</span><span class="chip keep">Keep 1</span><span class="chip borderline">Borderline 2</span></div>
 
