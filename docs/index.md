@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-08-24](reports/2026-08-24/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 3</span><span class="chip keep">Keep 2</span><span class="chip borderline">Borderline 0</span></div>
+
+Five alert threads, seven candidates, five papers through screening — and three of them are unusually good in the same specific way: each one changed *what it measured* and found that the field's standard metric had been measuring the experimental setup rather than the system.
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-08-20](reports/2026-08-20/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 0</span><span class="chip keep">Keep 1</span><span class="chip borderline">Borderline 0</span></div>
 
