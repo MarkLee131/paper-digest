@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-08-25](reports/2026-08-25/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 5</span><span class="chip keep">Keep 4</span><span class="chip borderline">Borderline 1</span></div>
+
+Today's nominal 24-hour window is empty: every thread it returned had already been read yesterday. The interesting part is what turned up while confirming that. A seven-day sweep found **eight alert threads, delivered on 20, 22 and 23 August, that no run has ever triaged** — the runs on those days did not happen, and a 24-hour filter does not look…
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-08-24](reports/2026-08-24/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 3</span><span class="chip keep">Keep 2</span><span class="chip borderline">Borderline 0</span></div>
 
