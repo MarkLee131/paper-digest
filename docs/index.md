@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-08-29](reports/2026-08-29/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 2</span><span class="chip keep">Keep 1</span><span class="chip borderline">Borderline 0</span></div>
+
+One alert thread, four candidates, three papers through screening — and two of the three are asking the same question from opposite ends of the same pipeline: **when you let a language model into a security-critical system, where exactly does the trust boundary go?**
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-08-25](reports/2026-08-25/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 5</span><span class="chip keep">Keep 4</span><span class="chip borderline">Borderline 1</span></div>
 
