@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-08-30](reports/2026-08-30/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 3</span><span class="chip keep">Keep 0</span><span class="chip borderline">Borderline 0</span></div>
+
+Two alert threads, five candidates, three papers through screening — and the three of them turn out to be the same paper written three times, about three different systems.
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-08-29](reports/2026-08-29/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 2</span><span class="chip keep">Keep 1</span><span class="chip borderline">Borderline 0</span></div>
 
