@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-09-04](reports/2026-09-04/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 3</span><span class="chip keep">Keep 5</span><span class="chip borderline">Borderline 2</span></div>
+
+Ten papers through screening, and what they have in common is a question about **what counts as evidence**. Not what counts as a correct answer — what counts as grounds for believing one.
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-09-01](reports/2026-09-01/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 3</span><span class="chip keep">Keep 7</span><span class="chip borderline">Borderline 3</span></div>
 
