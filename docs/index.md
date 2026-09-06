@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-09-06](reports/2026-09-06/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 1</span><span class="chip keep">Keep 1</span><span class="chip borderline">Borderline 1</span></div>
+
+A small window, and an unusually coherent one. Three papers arrived, and **not one of them is a detector.**
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-09-04](reports/2026-09-04/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 3</span><span class="chip keep">Keep 5</span><span class="chip borderline">Borderline 2</span></div>
 
