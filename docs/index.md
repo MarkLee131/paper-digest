@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-09-07](reports/2026-09-07/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 3</span><span class="chip keep">Keep 2</span><span class="chip borderline">Borderline 1</span></div>
+
+Nine candidates, six read, and they turn out to be arguing with each other about the same question: **what is a number allowed to claim?**
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-09-06](reports/2026-09-06/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 1</span><span class="chip keep">Keep 1</span><span class="chip borderline">Borderline 1</span></div>
 
