@@ -10,6 +10,13 @@ Daily Scholar-alert digest. Each entry below links to that day's full report. Us
 
 <!-- BEGIN AUTO-INDEX -->
 <div class="digest-card" markdown>
+### [2026-09-08](reports/2026-09-08/index.md)
+<div class="meta"><span class="chip outstanding">Outstanding 2</span><span class="chip keep">Keep 2</span><span class="chip borderline">Borderline 1</span></div>
+
+Eight candidates, five read, and the thread running through them is **what you are allowed to stop doing** — which measurements you can truncate, which artefacts you can stop hand-building, which representations you can stop paying for.
+</div>
+
+<div class="digest-card" markdown>
 ### [2026-09-07](reports/2026-09-07/index.md)
 <div class="meta"><span class="chip outstanding">Outstanding 3</span><span class="chip keep">Keep 2</span><span class="chip borderline">Borderline 1</span></div>
 
